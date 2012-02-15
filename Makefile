@@ -20,26 +20,25 @@
 
 # object files
 OBJSC = \
-	solver/metos3d_debug.o \
-	solver/metos3d_util.o \
-	solver/metos3d_geometry.o \
-	solver/metos3d_load.o \
-	solver/metos3d_bgc.o \
-	solver/metos3d_transport.o \
-	solver/metos3d_timestep.o \
-	solver/metos3d_solver.o \
-	solver/metos3d_init.o \
-	solver/metos3d.o
+	src/metos3d_debug.o \
+	src/metos3d_util.o \
+	src/metos3d_geometry.o \
+	src/metos3d_load.o \
+	src/metos3d_bgc.o \
+	src/metos3d_transport.o \
+	src/metos3d_timestep.o \
+	src/metos3d_solver.o \
+	src/metos3d_init.o \
+	src/metos3d.o
 
 # BGC model name
 BGCWORK = $(BGC:%/=%)
-BGCMODELNAME = $(BGCWORK:models/%=%)
+BGCMODELNAME = $(BGCWORK:model/%=%)
 BGCMODELFILE = model.o
 OBJSBGC = $(addprefix $(BGCWORK)/, $(BGCMODELFILE))
 
 # executable name
-VERSION = 0.1
-PROGRAMBASE = metos3d-${VERSION}-
+PROGRAMBASE = metos3d-simpack-
 PROGRAM = ${PROGRAMBASE}${BGCMODELNAME}.exe
 
 ALL: $(PROGRAM)
@@ -65,10 +64,3 @@ $(PROGRAM):
 	@echo '### Please set the PETSc environment variables.'
 	@echo '###'
 endif
-
-#
-#   DUMP
-#
-#BGCMODELNAMEVAR = $(value $(BGCMODELNAME))
-#BGCMODELFILE = model.o $(BGCMODELNAMEVAR)
-#N-DOP-O2-PZD = insolation.o BGC_INI.o BGC_MODEL.o
