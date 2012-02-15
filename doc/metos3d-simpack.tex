@@ -1,0 +1,717 @@
+%
+% Metos3D: A Marine Ecosystem Toolkit for Optimization and Simulation in 3-D
+% Copyright (C) 2012  Jaroslaw Piwonski, CAU, jpi@informatik.uni-kiel.de
+%
+% This program is free software: you can redistribute it and/or modify
+% it under the terms of the GNU General Public License as published by
+% the Free Software Foundation, either version 3 of the License, or
+% (at your option) any later version.
+%
+% This program is distributed in the hope that it will be useful,
+% but WITHOUT ANY WARRANTY; without even the implied warranty of
+% MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+% GNU General Public License for more details.
+%
+% You should have received a copy of the GNU General Public License
+% along with this program.  If not, see <http://www.gnu.org/licenses/>.
+%
+%   metos3d-simpack.tex
+%
+
+%
+%	document class
+%
+\documentclass{article}
+%
+%	packages
+%
+\usepackage{amsmath}
+\usepackage[pdfborder={0 0 0},colorlinks,urlcolor=blue]{hyperref}
+%
+%	commands
+%
+\parindent0em
+%
+%	BEGIN DOCUMENT
+%
+\begin{document}
+
+%
+%	title
+%
+\title{
+Metos3D\\
+\bigskip
+Simulation Package
+}
+\author{
+Jaroslaw Piwonski\thanks{\texttt{jpi@informatik.uni-kiel.de}} \,,
+Thomas Slawig\thanks{\texttt{ts@informatik.uni-kiel.de},
+both: Department of Computer Science, Algorithmic Optimal Control -- Computational Marine Science,
+Excellence Cluster The Future Ocean, Christian-Albrechts-Platz 4, 24118 Kiel, Germany.}
+}
+\date{\today}
+\maketitle
+
+%
+%	Introduction		%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\newpage
+\section{Introduction}
+
+The Simulation Package of Metos3D is a software for computation and simulation of
+steady periodic cycles of passive biogeochemical tracers. It complies to a general
+programming interface, embedding the biogeochemical modelling into an
+optimization or optimal control context [Piwonski and Slawig, 2012, in preparation].
+Metos3D is founded on the PETSc library \cite{PETSc} as a basis for efficient,
+parallelized numerical methods. Moreover it's portable and relies only on software,
+which is freely and public available.
+%
+The application of marine transport is based on the so-called Transport Matrix Method,
+whereas the idea and its use are presented in \cite{KhViCa05}, \cite{Kha07} and \cite{Kha08}.
+
+%
+%	Quick Start	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\section{Quick Start}
+
+Assuming \href{http://www.mcs.anl.gov/petsc/}{PETSc}, version 3.1 or higher,
+is installed do the following:
+
+\begin{enumerate}
+\item Prepare the data. See \href{http://www.informatik.uni-kiel.de/~algopt/metos3d/data/}{Metos3D Data} for more.
+\item Request package \texttt{metos3d-0.1-simpack.tar.gz} by email from \url{jpi@informatik.uni-kiel.de} or
+\url{ts@informatik.uni-kiel.de}
+%\item Download the software package. Example:
+%\begin{verbatim}
+%$>
+%wget http://www.informatik.uni-kiel.de/~algopt/metos3d/packs/simpack/\
+%metos3d-0.1-simpack.tar.gz
+%\end{verbatim}
+\item Uncompress and unarchive it. Example:
+\begin{verbatim}
+$>
+gunzip metos3d-0.1-simpack.tar.gz
+tar xf metos3d-0.1-simpack.tar
+\end{verbatim}
+%
+\item Download a model. See \href{http://www.informatik.uni-kiel.de/~algopt/metos3d/models/}{Metos3D Models} for more.
+%
+\item Change into the package root directory and set the PETSc environment variables. Example:
+\begin{verbatim}
+metos3d-0.1-simpack $>
+. petsc/de.uni-kiel.rz.rzcluster.petsc.opt.txt
+\end{verbatim}
+%
+\item Choose a BGC model to compile Metos3D with. Example:
+\begin{verbatim}
+metos3d-0.1-simpack $>
+make BGC=models/I-Cs/
+\end{verbatim}
+%\textbf{Note:} The last slash '/' must be provided!
+%
+\item Run the executable. Example:
+\begin{verbatim}
+metos3d-0.1-simpack $>
+./metos3d-0.1-I-Cs.exe models/I-Cs/options/de.uni-kiel.rz.rzcluster.option.I-Cs.txt 
+\end{verbatim}
+\end{enumerate}
+
+%
+%	Formats	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\newpage
+\section{Formats}
+
+Metos3D is scalable to a great extent. You can choose a free number of tracers,
+boundary and/or domain conditions for example. Mostly you will use files to
+provide and/or store data. And mostly your data file names will be
+enumerated. In that case Metos3D gives you the possibility to provide \emph{formats}.
+Note that
+an enumeration in Metos3D is always \textbf{zero indexed},
+i.e. for a given count $n$ it starts at $0$ and ends at $n-1$.
+
+\bigskip
+
+\textbf{Format:} \\
+A Metos3D format is a character string, that \textbf{optionally} embeds an \emph{integer format tag}.
+Note that the formatting of a format string \textbf{without} a tag is the format string
+itself. This is particularly desired for the case, where $ n = 1 $.
+
+\bigskip
+
+\textbf{Integer Format Tag:} \\
+A Metos3D integer format tag starts with a '\texttt{\$}', ends with a '\texttt{d}'
+and \textbf{optionally} consist of a width specification in between.
+
+\bigskip
+
+\textbf{Examples:} \\
+\\
+\begin{tabular}{r|r|r|r|r|r|r}
+			& \multicolumn{6}{l}{Format}																												\\ \cline{2-7}
+			& \texttt{\$d}			& \texttt{\$02d}		& \texttt{tr\$02d.petsc}	& \texttt{\$003d}	& \texttt{\$0004d}	& \texttt{sp\$0004d.petsc}	\\ \hline
+Enumeration	& \multicolumn{6}{l}{Formatting}																											\\ \hline
+0			& \texttt{0}				& \texttt{00}		& \texttt{tr00.petsc}	& \texttt{000}		& \texttt{0000}		& \texttt{sp0000.petsc}		\\
+$\vdots$		& $\vdots$				& $\vdots$			& $\vdots$				& $\vdots$			& $\vdots$			& $\vdots$					\\
+9			& \texttt{9}				& \texttt{09}		& \texttt{tr09.petsc}	& \texttt{009}		& \texttt{0009}		& \texttt{sp0009.petsc}		\\
+10			& \texttt{10}			& \texttt{10}		& \texttt{tr10.petsc}	& \texttt{010}		& \texttt{0010}		& \texttt{sp0010.petsc}		\\
+$\vdots$		& $\vdots$				& $\vdots$			& $\vdots$				& $\vdots$			& $\vdots$			& $\vdots$					\\
+99			& \texttt{99}			& \texttt{99}		& \texttt{tr99.petsc}	& \texttt{099}		& \texttt{0099}		& \texttt{sp0099.petsc}		\\
+100			& \texttt{100}			& \texttt{100}		& \texttt{tr100.petsc}	& \texttt{100}		& \texttt{0100}		& \texttt{sp0100.petsc}		\\
+$\vdots$		& $\vdots$				& $\vdots$			& $\vdots$				& $\vdots$			& $\vdots$			& $\vdots$					\\
+999			& \texttt{999}			& \texttt{999}		& \texttt{tr999.petsc}	& \texttt{999}		& \texttt{0999}		& \texttt{sp0999.petsc}		\\
+1000			& \texttt{1000}			& \texttt{1000}		& \texttt{tr1000.petsc}	& \texttt{1000}		& \texttt{1000}		& \texttt{sp1000.petsc}		\\
+$\vdots$		& $\vdots$				& $\vdots$			& $\vdots$				& $\vdots$			& $\vdots$			& $\vdots$					
+\end{tabular}
+
+%
+%	Options	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\newpage
+\section{Options}
+
+Once you have successfully compiled Metos3D you can use an \emph{option file}
+to control the software. You can find examples within the '\texttt{option}'
+directory. \textbf{Comma separated lists must not contain spaces.} The option file
+consists of the following options.
+
+%
+%	Debug
+%
+\subsection{Debug}
+
+The debugging option specifies the amount of information Metos3D gives you
+about the \emph{program flow}. You can find more monitoring options in Section \ref{Solver}. \\
+
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DDebugLevel
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a positive integer (or zero), specifying the amount of output \\
+\\
+\begin{tabular}{c|l}
+Value & Description \\ \hline
+\texttt{0} & no output \\
+\texttt{1} & output at main routine entry points \\
+\texttt{2} & additional output at subroutine entry points \\
+\texttt{3} & additional output during time stepping
+\end{tabular} \\
+
+%
+%	Geometry
+%
+\subsection{Geometry}
+
+The geometry options specify the type of geometry,
+the input directory and the names of the index files. \\
+
+% type
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DGeometryType                                
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a character string, specifying the geometry type \\
+\\
+\begin{tabular}{c|l}
+Value & Description \\ \hline
+\texttt{Profile} & geometry is described by profiles (see \cite{KhViCa05})
+\end{tabular} \\
+
+% data
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DProfileInputDirectory
+-Metos3DProfileIndexStartFile
+-Metos3DProfileIndexEndFile
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a character string, specifying the input directory as an absolute or a relative path \\
+- a character string, specifying the name of the start index file \\
+- a character string, specifying the name of the end index file
+
+%
+%	Tracer
+%
+\subsection{Tracer}
+
+% count
+The tracer options specify the number of tracers, the initial values or files and
+the input and output directories. \\
+
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DTracerCount
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a positive integer, specifying the number of tracers \\
+
+% init files
+If you decide to provide the tracer initial values by files,
+use the following options. Metos3D will search for the input directory option
+first. If present, it searches for the file format option first and then
+for the file name list option. \\
+
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DTracerInputDirectory
+-Metos3DTracerInitFileFormat
+-Metos3DTracerInitFile                              
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a character string, specifying the input directory as an absolute or a relative path \\
+- a character string, specifying the format of the initial value files \\
+- a comma separated list of character strings, specifying the names of the initial value files \\
+
+% init values
+Alternatively you can omit the options above and provide a list of initial values only.
+Metos3D will initialize the tracers with the corresponding (constant) concentration. \\
+
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DTracerInitValue
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a comma separated list of real values, specifying the initial (constant) tracer concentrations \\
+
+% output files
+Moreover you can provide options specifying the output directory and the output files.
+Again, Metos3D searches for the output directory option first. If present,
+it searches for the file format option first and then for the file name list. \\
+%If not present, no data will be written to disk. \\
+
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DTracerOutputDirectory
+-Metos3DTracerOutputFileFormat
+-Metos3DTracerOutputFile
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a character string, specifying the output directory as an absolute or a relative path \\
+- a character string, specifying the format of the output files \\
+- a comma separated list of character strings, specifying the names of the output files \\
+
+%
+%	Parameter
+%
+\subsection{Parameter}
+
+The parameter options specify the number of parameters for the BGC model
+and their values. \\
+
+% count
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DParameterCount
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a positive integer (or zero), specifying the number of parameters \\
+
+% values
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DParameterValue
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a list of comma separated real values, specifying the parameter values \\
+
+%
+%	Boundary Conditions
+%
+\subsection{Boundary Conditions}
+
+The boundary condition options specify the number of distinct boundary conditions,
+their input directory, their names, the number of data files per condition
+and the file format per condition. \\
+
+% count
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DBoundaryConditionCount
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a positive integer (or zero), specifying the number of boundary conditions \\
+
+If you don't need any boundary condition, provide zero as count.
+In this case you can skip the following options. \\
+
+% input, names
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DBoundaryConditionInputDirectory
+-Metos3DBoundaryConditionName
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a character string, specifying the input directory as an absolute or a relative path \\
+- a comma separated list of character strings, specifying the names of the boundary conditions \\
+
+The following options have to be provided for each boundary condition
+that was named by the boundary condition name list above. \\
+
+% name, file format
+\emph{Option name:}
+\begin{verbatim}
+-Metos3D...Count
+-Metos3D...FileFormat
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a positive integer, specifying the number of data files for the corresponding boundary condition \\
+- a character string, specifying the format of the data files for the corresponding boundary condition \\
+
+\textbf{Example:}
+\begin{quote}
+Assume one of your boundary condition is named '\texttt{IceCover}'. Then the options
+above will be '\texttt{-Metos3DIceCoverCount}' and '\texttt{-Metos3DIceCoverFileFormat}'.
+\end{quote}
+
+%
+%	Domain Conditions
+%
+\subsection{Domain Conditions}
+
+The domain condition options specify the number of distinct domain conditions,
+their input directory, their names, the number of data files per condition
+and the file format per condition. \\
+
+% count
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DDomainConditionCount
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a positive integer (or zero), specifying the number of domain conditions \\
+
+If you don't need any domain condition, provide zero as count.
+In this case you can skip the following options. \\
+
+% input, names
+\emph{Option names:}
+\begin{verbatim}
+-Metos3DDomainConditionInputDirectory
+-Metos3DDomainConditionName
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a character string, specifying the input directory as an absolute or a relative path \\
+- a comma separated list of character strings, specifying the names of the domain conditions \\
+
+The following options have to be provided for each domain condition
+that was named by the domain condition name list above. \\
+
+% name, file format
+\emph{Option names:}
+\begin{verbatim}
+-Metos3D...Count
+-Metos3D...FileFormat
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a positive integer, specifying the number of data files for the corresponding domain condition \\
+- a character string, specifying the format of the data files for the corresponding domain condition \\
+
+\textbf{Example:}
+\begin{quote}
+Assume one of your domain condition is named '\texttt{Heights}'. Then the options
+above will be '\texttt{-Metos3DHeightsCount}' and '\texttt{-Metos3DHeightsFileFormat}'.
+\end{quote}
+
+%
+%	Transport
+%
+\subsection{Transport}
+
+The transport options specify the transport type,
+the input directory of the matrix files, their names and count. \\
+
+% type
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DTransportType                                
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a character string, specifying the transport type \\
+\\
+\begin{tabular}{c|l}
+Value & Description \\ \hline
+\texttt{Matrix} & transport is described by matrices (see \cite{KhViCa05})
+\end{tabular} \\
+
+% input, count, names
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DMatrixInputDirectory
+-Metos3DMatrixCount
+-Metos3DMatrixExplicitFileFormat
+-Metos3DMatrixImplicitFileFormat
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a character string, specifying the input directory as an absolute or a relative path \\
+- a positive integer, specifying the number of matrix files \\
+- a character string, specifying the format of the explicit matrix files \\
+- a character string, specifying the format of the implicit matrix files \\
+
+%
+%	Time Stepping
+%
+\subsection{Time Stepping}
+
+The time stepping options specify the starting time, the number of
+time steps per period and the time step. \\
+
+% start, count, step
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DTimeStepStart
+-Metos3DTimeStepCount
+-Metos3DTimeStep
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a positive real value within the $[0, 1]$ time interval, specifying the starting time \\
+- a positive integer (or zero), specifying the number of time steps per period \\
+- a positive real value, specifying the time step \\
+
+%
+%	Solver
+%
+\subsection{Solver}
+\label{Solver}
+
+The solver options specifies the solver type used for simulation
+(computation of the solution) and the solver type dependent settings. \\
+
+% type
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DSolverType
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a character string, specifying the solver type \\
+\\
+\begin{tabular}{c|l}
+Value & Description \\ \hline
+\texttt{Spinup} & fixed point iteration \\
+\texttt{Newton} & Newton-Krylov solver from PETSc
+\end{tabular} \\
+
+% spin-up 
+\subsubsection{Spin-up}
+
+The spin-up options specify the maximum number of periods
+and the minimum tolerance for the difference between the
+tracer concentrations before and after one period.
+If you provide both options, the program stops if \textbf{one} of the conditions
+is satisfied. \\
+
+% count, tolerance
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DSpinupCount
+-Metos3DSpinupTolerance
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a positive integer (or zero), specifying the number of simulation periods \\
+- a positive real value, specifying the tolerance \\
+
+Moreover the spin-up solver gives you the opportunity to monitor the
+norm of the residual and to write the whole or parts of the trajectory to disk. \\
+
+% norm
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DSpinupMonitor
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- \textbf{no value}, boolean option: If present, the value is \texttt{TRUE} or else \texttt{FALSE}. \\
+
+% prefix
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DSpinupMonitorFileFormatPrefix
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a comma separated \textbf{pair} of character strings, specifying 
+the trajectory file name prefix according to current period and
+the current time step \\
+
+\textbf{Example:}
+\begin{quote}
+Assume you have two tracers and you have provided the output file names,
+the number of time steps and a spin-up period count with
+\begin{verbatim}
+-Metos3DTracerOutputFile                 I.petsc,Cs.petsc
+-Metos3DTimeStepCount                    2880
+-Metos3DSpinupCount                      1
+\end{verbatim}
+already. The \textbf{additional} option line
+\begin{verbatim}
+-Metos3DSpinupMonitorFileFormatPrefix    sp$0004d-,ts$0004d-
+\end{verbatim}
+will instruct Metos3D to create the following trajectory data files
+within the tracer output directory:
+\begin{verbatim}
+sp0000-ts0000-I.petsc ... sp0000-ts2879-I.petsc
+sp0000-ts0000-Cs.petsc ... sp0000-ts2879-Cs.petsc
+\end{verbatim}
+\end{quote}
+
+% modulo step
+\emph{Option name:}
+\begin{verbatim}
+-Metos3DSpinupMonitorModuloStep
+\end{verbatim}
+
+\emph{Option value:} \\
+\vspace{-0.3cm}\\
+- a comma separated \textbf{pair} of positive integers, specifying 
+the number of periods and time steps between output \\
+
+\textbf{Example:}
+\begin{quote}
+Assume we have the same situation as above. The \textbf{additional} option line
+\begin{verbatim}
+-Metos3DSpinupMonitorModuloStep          1,240
+\end{verbatim}
+will instruct Metos3D to create trajectory data files for every
+period, but only every 240 time steps within a period.
+\end{quote}
+
+% newton
+\subsubsection{Newton}
+
+The Newton-Krylov solver options are PETSc options with the
+'\texttt{Metos3DNewton\_}' prefix. See the PETSc manual for details.
+You can find a short description of the commonly used options
+in the following. SNES is the short cut for Scalable Nonlinear
+Equation Solver and KSP for Krylov subSPace method. \\
+
+\textbf{SNES options:}
+
+\begin{verbatim}
+-Metos3DNewton_snes_type                            ls
+\end{verbatim}
+The original option name is '\texttt{-snes\_type}'. It specifies the
+globalization technique used by the Newton solver. '\texttt{ls}'
+means Line Search with cubic backtracking.
+
+\begin{verbatim}
+-Metos3DNewton_snes_ksp_ew
+\end{verbatim}
+The original option name is '\texttt{-snes\_ksp\_ew}'. It specifies,
+if the solver algorithm should use the Eisenstatt-Walker \cite{EisWal1996}
+tolerance control or not.
+
+\begin{verbatim}
+-Metos3DNewton_snes_max_it                          1
+-Metos3DNewton_snes_max_funcs                       1
+\end{verbatim}
+The original option names are '\texttt{-snes\_max\_it}' and '\texttt{-snes\_max\_funcs}'.
+They specify the maximum number of Newton steps and function evaluations,
+respectively.
+
+\begin{verbatim}
+-Metos3DNewton_snes_rtol                            1.e-5
+-Metos3DNewton_snes_atol                            1.e-3
+\end{verbatim}
+The original option names are '\texttt{-snes\_rtol}' and '\texttt{-snes\_atol}'.
+They specify the minimum relative and absolute tolerance,
+respectively.
+
+\begin{verbatim}
+-Metos3DNewton_snes_monitor
+\end{verbatim}
+The original option name is '\texttt{-snes\_monitor}'. It specifies,
+if the solver should print out the residual norm every Newton step or not.
+
+\begin{verbatim}
+-Metos3DNewton_snes_view
+\end{verbatim}
+The original option name is '\texttt{-snes\_view}'. It specifies,
+if the solver should print out all solver parameters or not. \\
+
+\textbf{KSP options:}
+
+\begin{verbatim}
+-Metos3DNewton_ksp_type                             gmres
+\end{verbatim}
+The original option name is '\texttt{-ksp\_type}'. It specifies the
+algorithm for solving the system of linear equations during a
+Newton step. '\texttt{gmres}' means Generalized Minimal RESidual method.
+
+\begin{verbatim}
+-Metos3DNewton_ksp_max_it                           200
+\end{verbatim}
+The original option name is '\texttt{-ksp\_max\_it}'. 
+It specifies the maximum number of iterations (applications of the
+Jacobian to a vector) of the Krylov subspace algorithm.
+
+\begin{verbatim}
+-Metos3DNewton_ksp_gmres_restart                    200
+\end{verbatim}
+The original option name is '\texttt{-ksp\_gmres\_restart}'.
+It specifies the maximum number of basis functions for the Krylov subspace.
+
+\begin{verbatim}
+-Metos3DNewton_ksp_gmres_modifiedgramschmidt
+\end{verbatim}
+The original option name is '\texttt{-ksp\_gmres\_modifiedgramschmidt}'.
+It specifies, if the solver should use the modified (stabilized) orthogonalization or not.
+
+\begin{verbatim}
+-Metos3DNewton_ksp_monitor
+\end{verbatim}
+The original option name is '\texttt{-ksp\_monitor}'.
+It specifies,
+if the solver should print out the residual norm every Krylov step or not.
+
+%
+%	References	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%
+\bibliographystyle{plain}
+%\bibliography{/Users/jpicau/Documents/ARBEIT/CODE/Literature/literature}
+\input{metos3d-simpack-bbl}
+
+\end{document}
