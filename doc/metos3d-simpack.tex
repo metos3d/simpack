@@ -66,55 +66,57 @@ optimization or optimal control context [Piwonski and Slawig, 2012, in preparati
 Metos3D is founded on the PETSc library \cite{PETSc} as a basis for efficient,
 parallelized numerical methods. Moreover it's portable and relies only on software,
 which is freely and public available.
-%
+
 The application of marine transport is based on the so-called Transport Matrix Method,
 whereas the idea and its use are presented in \cite{KhViCa05}, \cite{Kha07} and \cite{Kha08}.
 
 %
-%	Quick Start	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%	Quick start	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
-\section{Quick Start}
+\section{Quick start}
 
-Assuming \href{http://www.mcs.anl.gov/petsc/}{PETSc}, version 3.1 or higher,
+Assuming \href{http://www.mcs.anl.gov/petsc/}{PETSc}, version 3.1,
 is installed do the following:
 
 \begin{enumerate}
-\item Prepare the data. See \href{http://www.informatik.uni-kiel.de/~algopt/metos3d/data/}{Metos3D Data} for more.
-\item Request package \texttt{metos3d-0.1-simpack.tar.gz} by email from \url{jpi@informatik.uni-kiel.de} or
-\url{ts@informatik.uni-kiel.de}
-%\item Download the software package. Example:
-%\begin{verbatim}
-%$>
-%wget http://www.informatik.uni-kiel.de/~algopt/metos3d/packs/simpack/\
-%metos3d-0.1-simpack.tar.gz
-%\end{verbatim}
-\item Uncompress and unarchive it. Example:
+%
+\item Prepare the \textbf{data}, i.e. download an archive from \\
+		\href{https://github.com/metos3d/data}{https://github.com/metos3d/data},
+		extract it and follow the instructions.
+%
+\item Prepare the \textbf{model}, i.e. download an archive from \\
+		\href{https://github.com/metos3d/model}{https://github.com/metos3d/model}
+		and extract it.
+%
+\item Prepare the \textbf{simulation package}, i.e. download an archive from \\
+		\href{https://github.com/metos3d/simpack}{https://github.com/metos3d/simpack},
+		extract it and change into the package directory.
+%
+\item Link the data and model directories. For example:
 \begin{verbatim}
 $>
-gunzip metos3d-0.1-simpack.tar.gz
-tar xf metos3d-0.1-simpack.tar
+ln -s ../metos3d-data-v0.2 data
+ln -s ../metos3d-model-v0.2 model
 \end{verbatim}
 %
-\item Download a model. See \href{http://www.informatik.uni-kiel.de/~algopt/metos3d/models/}{Metos3D Models} for more.
-%
-\item Change into the package root directory and set the PETSc environment variables. Example:
+\item Set the PETSc environment variables. For example:
 \begin{verbatim}
-metos3d-0.1-simpack $>
-. petsc/de.uni-kiel.rz.rzcluster.petsc.opt.txt
+$>
+. petsc/local.jserver.petsc.opt.txt
 \end{verbatim}
 %
-\item Choose a BGC model to compile Metos3D with. Example:
+\item Compile the software with a chosen model. For example:
 \begin{verbatim}
-metos3d-0.1-simpack $>
-make BGC=models/I-Cs/
+$>
+make BGC=model/I-Cs/
 \end{verbatim}
-%\textbf{Note:} The last slash '/' must be provided!
 %
-\item Run the executable. Example:
+\item Run executable with chosen options. For example:
 \begin{verbatim}
-metos3d-0.1-simpack $>
-./metos3d-0.1-I-Cs.exe models/I-Cs/options/de.uni-kiel.rz.rzcluster.option.I-Cs.txt 
+$>
+./metos3d-simpack-I-Cs.exe model/I-Cs/option/local.jserver.option.I-Cs.simpack.txt
 \end{verbatim}
+%
 \end{enumerate}
 
 %
