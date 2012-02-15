@@ -18,12 +18,15 @@ PETSc web page. http://www.mcs.anl.gov/petsc.
 
 [Khatiwala et al., 2005]
 Khatiwala, S., Visbeck, M., Cane, M., 2005.
-Accelerated simulation of passive tracers in ocean circulation models. Ocean Modelling 9, 51– 69.
+Accelerated simulation of passive tracers in ocean circulation models.
+Ocean Modelling 9, 51– 69.
 
 [Khatiwala, 2007]
 Khatiwala, S., 2007.
-A computational framework for simulation of bio- geochemical tracers in the ocean. Global Biogeochemical Cycles 21.
+A computational framework for simulation of biogeochemical tracers in the ocean.
+Global Biogeochemical Cycles 21.
 
 [Khatiwala, 2008]
 Khatiwala, S., 2008.
-Fast spin up of ocean biogeochemical models using matrix-free newton-krylov. Ocean Modelling 23, 121–129.
+Fast spin up of ocean biogeochemical models using matrix-free newton-krylov.
+Ocean Modelling 23, 121–129.
