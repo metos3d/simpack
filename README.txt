@@ -3,7 +3,7 @@ Metos3D: A Marine Ecosystem Toolkit for Optimization and Simulation in 3-D
 -- Simulation Package --
 
 The Simulation Package of Metos3D is a software for computation and simulation of steady periodic cycles of passive biogeochemical tracers. It complies to a general programming interface, embedding the biogeochemical modelling into an optimization or optimal control context [Piwonski and Slawig, 2012]. Metos3D is founded on the PETSc library [Balay et al., 2011] as a basis for efficient, parallelized numerical methods. Moreover it's portable and relies only on software, which is freely and public available.
-The application of marine transport is based on the so-called Transport Matrix Method, whereas the idea and its use are presented in [Khatiwala et al., 2005], [Khatiwala, 2007] and [Khatiwala, 2008].
+The application of marine transport is based on the Transport Matrix Method, whereas the idea and its use are presented in [Khatiwala et al., 2005], [Khatiwala, 2007] and [Khatiwala, 2008].
 
 -- Quick start --
 
