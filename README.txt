@@ -21,17 +21,17 @@ $>
 ln -s ../metos3d-data-v0.2 data
 ln -s ../metos3d-model-v0.2 model
 
-4. Set the PETSc environment variables. For example:
+5. Set the PETSc environment variables. For example:
 
 $>
 . petsc/local.jserver.petsc.opt.txt
 
-5. Compile the software with a chosen model. For example:
+6. Compile the software with a chosen model. For example:
 
 $>
 make BGC=model/I-Cs/
 
-6. Run executable with chosen options. For example:
+7. Run executable with chosen options. For example:
 
 $>
 ./metos3d-simpack-I-Cs.exe model/I-Cs/option/local.jserver.option.I-Cs.simpack.txt
