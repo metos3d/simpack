@@ -23,7 +23,7 @@
 
 #pragma mark -
 #undef  kDebugLevel
-#define kDebugLevel kDebugLevel2
+#define kDebugLevel kDebugLevel3
 
 #undef  __FUNCT__
 #define __FUNCT__ "Metos3DLoadInit"
@@ -43,14 +43,13 @@ Metos3DLoadInit(Metos3D *metos3d)
     PetscInt    nvecloc, nvecprev, nprofloc, nprofprev;
     PetscInt    *istartloc, *iendloc;
     PetscFunctionBegin;
-    Metos3DDebug(debug, kDebugLevel, comm, "Metos3DLoadInit\n");
     // determine process count and my process number
     MPI_Comm_size(comm, &nproc);
     MPI_Comm_rank(comm, &myproc);
     // store
     metos3d->processCount = nproc;
     metos3d->processMine = myproc;
-    Metos3DDebug(debug, kDebugLevel, comm, F2SD, "Metos3DLoadInit", "processCount:", nproc);
+    Metos3DDebug(metos3d, kDebugLevel, F2SD, "Metos3DLoadInit", "processCount:", nproc);
     // compute simple load distribution
     PetscMalloc(nproc*sizeof(PetscInt), &sumvecloc);
     PetscMalloc(nproc*sizeof(PetscInt), &sumvecprev);
@@ -108,6 +107,7 @@ Metos3DLoadInit(Metos3D *metos3d)
     Metos3DSynchronizedDebug11(debug, 3, comm, SYNCFS5SD, "Metos3DLoadInit", "myproc:", myproc,
         "nvecloc:", nvecloc, "nvecprev:", nvecprev, "nprofloc:", nprofloc, "nprofprev:", nprofprev);
     PetscSynchronizedFlush(comm);
+    Metos3DDebug(metos3d, kDebugLevel2, "Metos3DLoadInit\n");
     PetscFunctionReturn(0);
 }
 
@@ -116,10 +116,8 @@ Metos3DLoadInit(Metos3D *metos3d)
 PetscErrorCode
 Metos3DLoadFinal(Metos3D *metos3d)
 {
-    MPI_Comm    comm    = metos3d->comm;
-    PetscInt    debug   = metos3d->debugLevel;
     PetscFunctionBegin;
-    Metos3DDebug(debug, kDebugLevel, comm, "Metos3DLoadFinal\n");
+    Metos3DDebug(metos3d, kDebugLevel2, "Metos3DLoadFinal\n");
     // local indices
     PetscFree(metos3d->profileStartLocal);
     PetscFree(metos3d->profileEndLocal);

@@ -1,3 +1,17 @@
 TODO list
 
-1.
+1. Debug: build in timing
+2. Debug: improve output of debug stages
+2. Geometry: use PETSc files only
+3. *DONE* Maintain CHANGELOG file
+4. Implement load balancing
+5. Implement weights (volumes) in norm
+6. *DONE* Rewrite simpack for PETSc > 3.1
+7. Fix output routine (Metos3DSpinupMonitorModuloStep)
+8. Added possibility to provide parameters as binary values in a file
+9. Get rid of:
+    src/metos3d_util.c: In function ‘Metos3DUtilMatrixLoadAndCreate’:
+    src/metos3d_util.c:304:5: warning: value computed is not used
+10. Get rid of:
+    src/metos3d_solver.c: In function ‘Metos3DSolver’:
+    src/metos3d_solver.c:289:17: warning: value computed is not used

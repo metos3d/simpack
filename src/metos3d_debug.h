@@ -32,22 +32,22 @@
 #define kDebugLevel4 4
 
 // formats
-#define F2S     "%-40s %s\n"                                                        // 2 x string
-#define F2SE    "%-40s %s %-8e\n"                                                   // 2 x string, 1 x double
-#define F3S     "%-40s %14s %-42s\n"                                                // 3 x string
-#define F2SD    "%-40s %14s %-8d\n"                                                 // 2 x string, 1 x int
-#define FSSDSE  "%-40s %14s %-8d %14s %-8e\n"                                       // 2 x string, 1 x int, 1 x string, 1 x double
-#define FS2SESD "%-40s %14s %-8e %14s %-8d %14s %-8e %14s %-8d\n"
-#define F4SD    "%-40s %14s %-42s %14s %-8d\n"                                      // 4 x string, 1 x int
-#define F4SE    "%-40s %14s %-42s %14s %-8e\n"                                      // 4 x string, 1 x double
-#define F5S     "%-40s %14s %-42s %14s %-42s\n"                                     // 5 x string
-#define FS5SD   "%-40s %14s %-8d, %14s %-8d, %14s %-8d, %14s %-8d, %14s %-8d\n"     // 1 x string, 5 x (1 x string, 1 x int)
+#define F2S     "%-40s %18s\n"                                                        // 2 x string
+#define F2SE    "%-40s %18s %-8e\n"                                                   // 2 x string, 1 x double
+#define F3S     "%-40s %18s %-42s\n"                                                // 3 x string
+#define F2SD    "%-40s %18s %-8d\n"                                                 // 2 x string, 1 x int
+#define FSSDSE  "%-40s %18s %-8d %14s %-8e\n"                                       // 2 x string, 1 x int, 1 x string, 1 x double
+#define FS2SESD "%-40s %18s %-8e %14s %-8d %14s %-8e %14s %-8d\n"
+#define F4SD    "%-40s %18s %-42s %14s %-8d\n"                                      // 4 x string, 1 x int
+#define F4SE    "%-40s %18s %-42s %14s %-8e\n"                                      // 4 x string, 1 x double
+#define F5S     "%-40s %18s %-42s %14s %-42s\n"                                     // 5 x string
+#define FS5SD   "%-40s %18s %-8d, %14s %-8d, %14s %-8d, %14s %-8d, %14s %-8d\n"     // 1 x string, 5 x (1 x string, 1 x int)
 #define FDSE    "%0004d %s %.12e\n"
 
 #define SYNCFS5SD " --> %-40s %14s %-8d %14s %-8d %14s %-8d %14s %-8d %14s %-8d\n"  // 1 x string, 5 x (1 x string, 1 x int)
 
-extern PetscErrorCode Metos3DDebug(PetscInt, PetscInt, MPI_Comm, const char*, ...);
-extern PetscErrorCode Metos3DFlag(PetscTruth, char*);
+extern PetscErrorCode Metos3DDebug(Metos3D*, PetscInt, const char*, ...);
+extern PetscErrorCode Metos3DFlag(PetscBool, char*);
 
 #define Metos3DSynchronizedDebug(du,dl,c,m,a) {if(du>=dl) PetscSynchronizedPrintf(c,m,a);}
 #define Metos3DSynchronizedDebug2(du,dl,c,m,a1,a2) {if(du>=dl) PetscSynchronizedPrintf(c,m,a1,a2);}

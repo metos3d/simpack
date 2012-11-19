@@ -23,15 +23,14 @@
 
 #pragma mark -
 #undef  kDebugLevel
-#define kDebugLevel kDebugLevel1
+#define kDebugLevel kDebugLevel2
 
 #undef  __FUNCT__
 #define __FUNCT__ "Metos3DSolverInit"
 PetscErrorCode
 Metos3DSolverInit(Metos3D *metos3d)
 {
-    MPI_Comm    comm    = metos3d->comm;
-    PetscInt    debug   = metos3d->debugLevel;
+    MPI_Comm    comm        = metos3d->comm;
     // bgc
     PetscInt    ntracer     = metos3d->tracerCount;
     // geometry
@@ -41,9 +40,9 @@ Metos3DSolverInit(Metos3D *metos3d)
     // work vars
     char        solverType[PETSC_MAX_PATH_LEN];    
     char        message   [PETSC_MAX_PATH_LEN];    
-    PetscTruth  flag;
+    PetscBool   flag;
     PetscFunctionBegin;
-    Metos3DDebug(debug, kDebugLevel, comm, "Metos3DSolverInit\n");
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DSolverInit\n");
     
     // solver type
     Metos3DUtilOptionsGetString(metos3d, "-Metos3DSolverType", solverType);
@@ -80,22 +79,20 @@ Metos3DSolverInit(Metos3D *metos3d)
 PetscErrorCode
 Metos3DSolverFinal(Metos3D *metos3d)
 {
-    MPI_Comm    comm    = metos3d->comm;
-    PetscInt    debug   = metos3d->debugLevel;
     // work vars
     char        solverType[PETSC_MAX_PATH_LEN];    
     char        message   [PETSC_MAX_PATH_LEN];    
-    PetscTruth  flag;
+    PetscBool   flag;
     PetscFunctionBegin;
-    Metos3DDebug(debug, kDebugLevel, comm, "Metos3DSolverFinal\n");
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DSolverFinal\n");
     // solver type
     Metos3DUtilOptionsGetString(metos3d, "-Metos3DSolverType", solverType);
     PetscStrcmp("Newton", solverType, &flag);
     if (flag == PETSC_TRUE) {
         // SNES
-        VecDestroyVecs(metos3d->fnBD, 1);
-        MatDestroy(metos3d->JShell);
-        SNESDestroy(metos3d->snes);    
+        VecDestroyVecs(1, &metos3d->fnBD);
+        MatDestroy(&metos3d->JShell);
+        SNESDestroy(&metos3d->snes);
     } else {
         PetscStrcmp("Spinup", solverType, &flag);
         if (flag == PETSC_TRUE) {
@@ -108,14 +105,11 @@ Metos3DSolverFinal(Metos3D *metos3d)
     PetscFunctionReturn(0);
 }
 
-extern PetscErrorCode Metos3DSolverSpinup(Metos3D*);
 #undef  __FUNCT__
 #define __FUNCT__ "Metos3DSolverSpinup"
 PetscErrorCode
 Metos3DSolverSpinup(Metos3D *metos3d)
 {
-    MPI_Comm    comm    = metos3d->comm;
-    PetscInt    debug   = metos3d->debugLevel;
     PetscInt    npref   = metos3d->fileFormatPrefixCount;
     // bgc
     PetscInt    ntracer = metos3d->tracerCount;
@@ -127,27 +121,27 @@ Metos3DSolverSpinup(Metos3D *metos3d)
     // work vars
     PetscInt    nstep, istep, itracer;
     PetscScalar acc;
-    PetscTruth  flag        = PETSC_FALSE;
-    PetscTruth  countFlag   = PETSC_FALSE;
-    PetscTruth  accFlag     = PETSC_FALSE;
-    PetscTruth  monFlag     = PETSC_FALSE;
+    PetscBool   flag        = PETSC_FALSE;
+    PetscBool   countFlag   = PETSC_FALSE;
+    PetscBool   accFlag     = PETSC_FALSE;
+    PetscBool   monFlag     = PETSC_FALSE;
     Vec         *yin, *yout;
     Vec         *ystarBD, *yworkBD;
     PetscReal   ynorm;
     PetscFunctionBegin;
-    Metos3DDebug(debug, kDebugLevel, comm, "Metos3DSolverSpinup\n");    
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DSolverSpinup\n");    
 
     PetscOptionsGetInt(PETSC_NULL, "-Metos3DSpinupCount", &nstep, &flag);
     if (flag == PETSC_TRUE) {
         // count
         countFlag = PETSC_TRUE;
-        Metos3DDebug(debug, kDebugLevel, comm, F4SD, "Metos3DSolverSpinup", "optionName:", "-Metos3DSpinupCount", "value:", nstep);
+        Metos3DDebug(metos3d, kDebugLevel, F4SD, "Metos3DSolverSpinup", "optionName:", "-Metos3DSpinupCount", "value:", nstep);
     } 
     PetscOptionsGetScalar(PETSC_NULL, "-Metos3DSpinupTolerance", &acc, &flag);
     if (flag == PETSC_TRUE) {
         // acc
         accFlag = PETSC_TRUE;
-        Metos3DDebug(debug, kDebugLevel, comm, F4SE, "Metos3DSolverSpinup", "optionName:", "-Metos3DSpinupTolerance", "value:", acc);
+        Metos3DDebug(metos3d, kDebugLevel, F4SE, "Metos3DSolverSpinup", "optionName:", "-Metos3DSpinupTolerance", "value:", acc);
     }
     if ((countFlag == PETSC_FALSE) && (accFlag == PETSC_FALSE)) {
         char message[PETSC_MAX_PATH_LEN];    
@@ -163,7 +157,7 @@ Metos3DSolverSpinup(Metos3D *metos3d)
     Metos3DUtilVecCopySeparateToDiagonal(metos3d, ntracer, nvecloc, metos3d->y0, ystarBD);
     Metos3DUtilVecCopyDiagonalToSeparate(metos3d, ntracer, nvecloc, ystarBD, yin);
     // monitor
-    PetscOptionsGetTruth(PETSC_NULL, "-Metos3DSpinupMonitor", &monFlag, &flag);
+    PetscOptionsGetBool(PETSC_NULL, "-Metos3DSpinupMonitor", &monFlag, &flag);
     // 
     // spinup
     istep = 0;
@@ -216,7 +210,7 @@ Metos3DSolverSpinup(Metos3D *metos3d)
         VecNorm(*ystarBD, NORM_2, &ynorm);
         VecCopy(*yworkBD, *ystarBD);
         // monitor
-        if (monFlag) Metos3DDebug(1, 1, comm, FDSE, istep, "Spinup Function norm", ynorm);
+        if (monFlag) Metos3DDebug(metos3d, 0, FDSE, istep, "Spinup Function norm", ynorm);
         // step counter
         istep++;
     }
@@ -224,21 +218,37 @@ Metos3DSolverSpinup(Metos3D *metos3d)
     Metos3DBGCOutput(metos3d, ntracer, yin);
     
     // free work vectors
-    VecDestroyVecs(yin, ntracer);
-    VecDestroyVecs(yout, ntracer);
-    VecDestroyVecs(ystarBD, 1);
-    VecDestroyVecs(yworkBD, 1);
+    VecDestroyVecs(ntracer, &yin);
+    VecDestroyVecs(ntracer, &yout);
+    VecDestroyVecs(1, &ystarBD);
+    VecDestroyVecs(1, &yworkBD);
     
     PetscFunctionReturn(0);
 }
-    
+
+#undef  __FUNCT__
+#define __FUNCT__ "Metos3DSolverFormJacobian"
+PetscErrorCode
+Metos3DSolverFormJacobian(SNES snes, Vec ynBD, Mat *JShell, Mat *PCShell, MatStructure *flag, void *ctx)
+{
+    Metos3D     *metos3d = (Metos3D*)ctx;
+    PetscFunctionBegin;
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DSolverFormJacobian\n");
+    // assemble matrix after MatSetBase from SNES
+    MatAssemblyBegin(*JShell, MAT_FINAL_ASSEMBLY);
+    MatAssemblyEnd(*JShell, MAT_FINAL_ASSEMBLY);
+    PetscFunctionReturn(0);
+}
+
+#pragma mark -
+#undef  kDebugLevel
+#define kDebugLevel kDebugLevel1
+
 #undef  __FUNCT__
 #define __FUNCT__ "Metos3DSolver"
 PetscErrorCode
 Metos3DSolver(Metos3D *metos3d)
 {
-    MPI_Comm    comm    = metos3d->comm;
-    PetscInt    debug   = metos3d->debugLevel;
     // bgc
     PetscInt    ntracer = metos3d->tracerCount;
     PetscInt    nvec    = metos3d->vectorLength;
@@ -246,10 +256,8 @@ Metos3DSolver(Metos3D *metos3d)
     // work vars
     char        solverType[PETSC_MAX_PATH_LEN];    
     char        message   [PETSC_MAX_PATH_LEN];    
-    PetscTruth  flag;
-    PetscFunctionBegin;
-    Metos3DDebug(debug, kDebugLevel, comm, "Metos3DSolver\n");    
-    
+    PetscBool   flag;
+    PetscFunctionBegin;    
     // solver type
     Metos3DUtilOptionsGetString(metos3d, "-Metos3DSolverType", solverType);
     PetscStrcmp("Newton", solverType, &flag);
@@ -267,7 +275,7 @@ Metos3DSolver(Metos3D *metos3d)
         SNESSolve(metos3d->snes, PETSC_NULL, *ystarBD);
         // y0 = ystarBD
         Metos3DUtilVecCopyDiagonalToSeparate(metos3d, ntracer, nvecloc, ystarBD, metos3d->y0);
-        VecDestroyVecs(ystarBD, 1);
+        VecDestroyVecs(1, &ystarBD);
         // output
         Metos3DBGCOutput(metos3d, ntracer, metos3d->y0);
     } else {
@@ -321,24 +329,7 @@ Metos3DSolver(Metos3D *metos3d)
             Metos3DFlag(flag, message);
         }
     }
-    
+    // debug
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DSolver\n");    
     PetscFunctionReturn(0);
 }
-
-
-#undef  __FUNCT__
-#define __FUNCT__ "Metos3DSolverFormJacobian"
-PetscErrorCode
-Metos3DSolverFormJacobian(SNES snes, Vec ynBD, Mat *JShell, Mat *PCShell, MatStructure *flag, void *ctx)
-{
-//    Metos3D     *metos3d    = (Metos3D*)ctx;
-    MPI_Comm    comm        = ((Metos3D*)ctx)->comm;
-    PetscInt    debug       = ((Metos3D*)ctx)->debugLevel;
-    PetscFunctionBegin;
-    Metos3DDebug(debug, kDebugLevel, comm, "Metos3DSolverFormJacobian\n");
-    // assemble matrix after MatSetBase from SNES
-    MatAssemblyBegin(*JShell, MAT_FINAL_ASSEMBLY);
-    MatAssemblyEnd(*JShell, MAT_FINAL_ASSEMBLY);
-    PetscFunctionReturn(0);
-}
-

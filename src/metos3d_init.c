@@ -30,19 +30,16 @@
 PetscErrorCode
 Metos3DInitWithFilePath(Metos3D *metos3d, const char *filePath)
 {
-    MPI_Comm    comm = PETSC_COMM_WORLD;
-    PetscInt    debug;
     PetscFunctionBegin;
+    // start timing
     // store communicator
-    metos3d->comm = comm;
     // read in options file
-    PetscOptionsInsertFile(comm, filePath, PETSC_TRUE);
+    PetscGetTime(&metos3d->startTime);
+    metos3d->comm = PETSC_COMM_WORLD;
+    PetscOptionsInsertFile(metos3d->comm, filePath, PETSC_TRUE);
     // read in debug option
     metos3d->debugLevel = kDebugLevel0;
-    Metos3DUtilOptionsGetInt(metos3d, "-Metos3DDebugLevel", &debug);
-    // store user debug level
-    metos3d->debugLevel = debug;
-    Metos3DDebug(debug, kDebugLevel, comm, F3S, "Metos3DInitWithFilePath", "filePath:", filePath);
+    Metos3DUtilOptionsGetInt(metos3d, "-Metos3DDebugLevel", &metos3d->debugLevel);
     // init geometry, load, bgc, trasport, timestep, solver, ...
     Metos3DGeometryInit(metos3d);
     Metos3DLoadInit(metos3d);
@@ -50,8 +47,10 @@ Metos3DInitWithFilePath(Metos3D *metos3d, const char *filePath)
     Metos3DTransportInit(metos3d);
     Metos3DTimeStepInit(metos3d);
     Metos3DSolverInit(metos3d);
-    // wait for all processors  
+    // wait for all processors
     PetscBarrier(PETSC_NULL);
+    // debug
+    Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DInitWithFilePath", "filePath:", filePath);
     PetscFunctionReturn(0);
 }
 
@@ -60,11 +59,8 @@ Metos3DInitWithFilePath(Metos3D *metos3d, const char *filePath)
 PetscErrorCode
 Metos3DFinal(Metos3D *metos3d)
 {
-    MPI_Comm    comm    = metos3d->comm;
-    PetscInt    debug   = metos3d->debugLevel;
     PetscFunctionBegin;
-    Metos3DDebug(debug, kDebugLevel, comm, "Metos3DFinal\n");
-    // wait for all processors  
+    // wait for all processors
     PetscBarrier(PETSC_NULL);
     // final ..., solver, timestep, transport, bgc, load, geometry
     Metos3DSolverFinal(metos3d);
@@ -73,5 +69,7 @@ Metos3DFinal(Metos3D *metos3d)
     Metos3DBGCFinal(metos3d);    
     Metos3DLoadFinal(metos3d);
     Metos3DGeometryFinal(metos3d);
+    // debug
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DFinal\n");
     PetscFunctionReturn(0);
 }

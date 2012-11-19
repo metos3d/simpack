@@ -30,13 +30,11 @@
 PetscErrorCode
 Metos3DTransportInit(Metos3D *metos3d)
 {
-    MPI_Comm    comm    = metos3d->comm;
-    PetscInt    debug   = metos3d->debugLevel;
     // work vars
     char        transportType[PETSC_MAX_PATH_LEN];    
-    PetscTruth  flag;
+    PetscBool   flag;
     PetscFunctionBegin;
-    Metos3DDebug(debug, kDebugLevel, comm, "Metos3DTransportInit\n");
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DTransportInit\n");
     
     // transport type
     Metos3DUtilOptionsGetString(metos3d, "-Metos3DTransportType", transportType);
@@ -53,13 +51,11 @@ Metos3DTransportInit(Metos3D *metos3d)
 PetscErrorCode
 Metos3DTransportFinal(Metos3D *metos3d)
 {
-    MPI_Comm    comm    = metos3d->comm;
-    PetscInt    debug   = metos3d->debugLevel;
     // work vars
     char        transportType[PETSC_MAX_PATH_LEN];    
-    PetscTruth  flag;
+    PetscBool   flag;
     PetscFunctionBegin;
-    Metos3DDebug(debug, kDebugLevel, comm, "Metos3DTransportFinal\n");
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DTransportFinal\n");
     // transport type
     Metos3DUtilOptionsGetString(metos3d, "-Metos3DTransportType", transportType);
     PetscStrcmp("Matrix", transportType, &flag);
@@ -75,8 +71,6 @@ Metos3DTransportFinal(Metos3D *metos3d)
 PetscErrorCode
 Metos3DTransportMatrixInit(Metos3D *metos3d)
 {
-    MPI_Comm    comm    = metos3d->comm;
-    PetscInt    debug   = metos3d->debugLevel;
     // work vars
     char        inputDirectory  [PETSC_MAX_PATH_LEN];    
     char        formatexp       [PETSC_MAX_PATH_LEN];
@@ -86,7 +80,7 @@ Metos3DTransportMatrixInit(Metos3D *metos3d)
     char        fileFormat[PETSC_MAX_PATH_LEN];
     char        filePath  [PETSC_MAX_PATH_LEN];
     PetscFunctionBegin;
-    Metos3DDebug(debug, kDebugLevel, comm, "Metos3DTransportMatrixInit\n");
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DTransportMatrixInit\n");
     // input directory
     Metos3DUtilOptionsGetString(metos3d, "-Metos3DMatrixInputDirectory", inputDirectory);
     // matrixCount
@@ -130,24 +124,22 @@ Metos3DTransportMatrixInit(Metos3D *metos3d)
 PetscErrorCode
 Metos3DTransportMatrixFinal(Metos3D *metos3d)
 {
-    MPI_Comm    comm    = metos3d->comm;
-    PetscInt    debug   = metos3d->debugLevel;
     // work vars
     PetscInt    nmat    = metos3d->matrixCount;
     PetscInt    imat;
     PetscFunctionBegin;
-    Metos3DDebug(debug, kDebugLevel, comm, "Metos3DTransportMatrixFinal\n");
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DTransportMatrixFinal\n");
     // matrix
     for (imat = 0; imat < nmat; imat++)
     {
-        MatDestroy(metos3d->matrixExplicitArray[imat]);
-        MatDestroy(metos3d->matrixImplicitArray[imat]);
+        MatDestroy(&metos3d->matrixExplicitArray[imat]);
+        MatDestroy(&metos3d->matrixImplicitArray[imat]);
     }
     PetscFree(metos3d->matrixExplicitArray);
     PetscFree(metos3d->matrixImplicitArray);
     // work
-    MatDestroy(metos3d->Aework);
-    MatDestroy(metos3d->Aiwork);
+    MatDestroy(&metos3d->Aework);
+    MatDestroy(&metos3d->Aiwork);
     PetscFunctionReturn(0);
 }
 
@@ -156,13 +148,11 @@ Metos3DTransportMatrixFinal(Metos3D *metos3d)
 PetscErrorCode
 Metos3DTransport(Metos3D *metos3d, PetscScalar t, PetscInt n_mat, Mat *A, PetscInt n_tracer, Vec *y_in, Vec *y_out, Mat *A_work)
 {
-    MPI_Comm    comm    = metos3d->comm;
-    PetscInt    debug   = metos3d->debugLevel;
     // work vars
     PetscInt    i, i_alpha, i_beta;
     PetscScalar alpha, beta;
     PetscFunctionBegin;
-    Metos3DDebug(debug, kDebugLevel, comm, "Metos3DTransport\n");
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DTransport\n");
     // interpolate
     Metos3DUtilInterpolate(metos3d, t, n_mat, &i_alpha, &alpha, &i_beta, &beta);
     // A_work = A[i_alpha]

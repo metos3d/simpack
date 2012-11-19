@@ -24,20 +24,46 @@
 #undef  __FUNCT__
 #define __FUNCT__ "Metos3DDebug"
 PetscErrorCode
-Metos3DDebug(PetscInt debugLevel, PetscInt level, MPI_Comm comm, const char *format, ...)
+Metos3DDebug(Metos3D *metos3d, PetscInt level, const char *format, ...)
 {
-    char newformat[PETSC_MAX_PATH_LEN];
     PetscFunctionBegin;
-    if (debugLevel >= level) {
+    if (metos3d->debugLevel >= level) {
         PetscMPIInt rank;
-        MPI_Comm_rank(comm, &rank);
+        MPI_Comm_rank(metos3d->comm, &rank);
         if (!rank) {
-            va_list args;
+            // work vars
+            va_list         args;
+            PetscLogDouble  endTime, elapsedTime;
+            char            newformat[PETSC_MAX_PATH_LEN];
+            // get end time
+            // compute elapsed time
+            // and init new timing
+            PetscGetTime(&endTime);
+            elapsedTime = endTime - metos3d->startTime;
+            PetscGetTime(&metos3d->startTime);
+            // set new format
+            if (metos3d->debugLevel > level)
+            {
+                // without time
+                if (level==0) sprintf(newformat, "               > %s", format);
+                if (level==1) sprintf(newformat, "               > %s", format);
+                if (level==2) sprintf(newformat, "             : +%s", format);
+                if (level==3) sprintf(newformat, "             : +-%s", format);
+            }
+            else
+            {
+                // with time
+                if (level==0) sprintf(newformat, "%12.3fs: %s", elapsedTime, format);
+                if (level==1) sprintf(newformat, "%12.3fs: %s", elapsedTime, format);
+                if (level==2) sprintf(newformat, "%12.3fs:   %s", elapsedTime, format);
+                if (level==3) sprintf(newformat, "%12.3fs: %s", elapsedTime, format);
+            }
+//            // add indent depending on level
+//            if (level==1) sprintf(newformat, "%16.2f sec -> %s", elapsedTime, format);
+//            if (level==2) sprintf(newformat, "%16.2f sec: >%s", elapsedTime, format);
+//            if (level>=3) sprintf(newformat, "%16.2f sec: ->%s", elapsedTime, format);
+            // get variable arg list
             va_start(args, format);
-            // add indent depending on level
-            if (level==1) sprintf(newformat, "---> %s", format);
-            if (level==2) sprintf(newformat, " --> %s", format);
-            if (level>=3) sprintf(newformat, "  -> %s", format);
             PetscVFPrintf(PETSC_STDOUT, newformat, args);
             va_end(args);
         }
@@ -48,7 +74,7 @@ Metos3DDebug(PetscInt debugLevel, PetscInt level, MPI_Comm comm, const char *for
 #undef  __FUNCT__
 #define __FUNCT__ "Metos3DFlag"
 PetscErrorCode
-Metos3DFlag(PetscTruth flag, char *message)
+Metos3DFlag(PetscBool flag, char *message)
 {
     PetscFunctionBegin;
     if (flag == PETSC_FALSE) {
