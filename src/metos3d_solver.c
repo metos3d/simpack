@@ -257,7 +257,9 @@ Metos3DSolver(Metos3D *metos3d)
     char        solverType[PETSC_MAX_PATH_LEN];    
     char        message   [PETSC_MAX_PATH_LEN];    
     PetscBool   flag;
-    PetscFunctionBegin;    
+    PetscFunctionBegin;
+    // debug start
+    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // solver type
     Metos3DUtilOptionsGetString(metos3d, "-Metos3DSolverType", solverType);
     PetscStrcmp("Newton", solverType, &flag);

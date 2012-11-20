@@ -31,10 +31,10 @@ PetscErrorCode
 Metos3DInitWithFilePath(Metos3D *metos3d, const char *filePath)
 {
     PetscFunctionBegin;
-    // start timing
+    // debug start
+    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // store communicator
     // read in options file
-    PetscGetTime(&metos3d->startTime);
     metos3d->comm = PETSC_COMM_WORLD;
     PetscOptionsInsertFile(metos3d->comm, filePath, PETSC_TRUE);
     // read in debug option
@@ -49,7 +49,7 @@ Metos3DInitWithFilePath(Metos3D *metos3d, const char *filePath)
     Metos3DSolverInit(metos3d);
     // wait for all processors
     PetscBarrier(PETSC_NULL);
-    // debug
+    // debug stop
     Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DInitWithFilePath", "filePath:", filePath);
     PetscFunctionReturn(0);
 }
@@ -60,6 +60,8 @@ PetscErrorCode
 Metos3DFinal(Metos3D *metos3d)
 {
     PetscFunctionBegin;
+    // debug start
+    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // wait for all processors
     PetscBarrier(PETSC_NULL);
     // final ..., solver, timestep, transport, bgc, load, geometry
