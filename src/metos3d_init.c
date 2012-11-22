@@ -21,7 +21,6 @@
 
 #include "metos3d_init.h"
 
-#pragma mark -
 #undef  kDebugLevel
 #define kDebugLevel kDebugLevel1
 
@@ -31,8 +30,8 @@ PetscErrorCode
 Metos3DInitWithFilePath(Metos3D *metos3d, const char *filePath)
 {
     PetscFunctionBegin;
-    // debug start
-    PetscGetTime(&metos3d->startTime[kDebugLevel]);
+    // debug start, kDebugLevel1
+    PetscGetTime(&metos3d->startTime[kDebugLevel1]);
     // store communicator
     // read in options file
     metos3d->comm = PETSC_COMM_WORLD;
@@ -40,6 +39,10 @@ Metos3DInitWithFilePath(Metos3D *metos3d, const char *filePath)
     // read in debug option
     metos3d->debugLevel = kDebugLevel0;
     Metos3DUtilOptionsGetInt(metos3d, "-Metos3DDebugLevel", &metos3d->debugLevel);
+    // set level 0 as lowest possible
+    // set level 4 as highest possible
+    metos3d->debugLevel = (metos3d->debugLevel < kDebugLevel0 ? kDebugLevel0 : metos3d->debugLevel);
+    metos3d->debugLevel = (metos3d->debugLevel > kDebugLevel4 ? kDebugLevel4 : metos3d->debugLevel);
     // init geometry, load, bgc, trasport, timestep, solver, ...
     Metos3DGeometryInit(metos3d);
     Metos3DLoadInit(metos3d);
@@ -60,8 +63,8 @@ PetscErrorCode
 Metos3DFinal(Metos3D *metos3d)
 {
     PetscFunctionBegin;
-    // debug start
-    PetscGetTime(&metos3d->startTime[kDebugLevel]);
+//    // debug start
+//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // wait for all processors
     PetscBarrier(PETSC_NULL);
     // final ..., solver, timestep, transport, bgc, load, geometry

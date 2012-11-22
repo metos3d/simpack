@@ -46,7 +46,6 @@
 
 #include "metos3d_util.h"
 
-#pragma mark -
 #undef  kDebugLevel
 #define kDebugLevel kDebugLevel3
 
@@ -58,11 +57,14 @@ Metos3DUtilVecLoadIntoVector(Metos3D *metos3d, char *filePath, Vec *v)
     MPI_Comm comm = metos3d->comm;
     PetscViewer viewer;
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DUtilVecLoadIntoVector", "filePath:", filePath);
+//    // debug start
+//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     PetscViewerBinaryOpen(comm, filePath, FILE_MODE_READ, &viewer);
     VecLoad(*v, viewer);
     PetscViewerDestroy(&viewer);
-    PetscFunctionReturn(0);   
+    // debug stop
+    Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DUtilVecLoadIntoVector", "filePath:", filePath);
+    PetscFunctionReturn(0);
 }
 
 #undef  __FUNCT__
@@ -74,11 +76,14 @@ Metos3DUtilVectorView(Metos3D *metos3d, char *filePath, Vec *v)
     // work vars
     PetscViewer     viewer;
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DUtilVectorView", "filePath:", filePath);
+//    // debug start
+//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // open file, write vector
     PetscViewerBinaryOpen(comm, filePath, FILE_MODE_WRITE, &viewer);
     VecView(*v, viewer);
     PetscViewerDestroy(&viewer);
+    // debug stop
+    Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DUtilVectorView", "filePath:", filePath);
     PetscFunctionReturn(0);
 }
 
@@ -89,6 +94,8 @@ Metos3DUtilFormatParse(Metos3D *metos3d, char *string)
 {
     char *where;
     PetscFunctionBegin;
+//    // debug start
+//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // PETSc does not read in '%', we use '$' instead.
     // IMPORTANT LIMITATION: This means you cannot use '$' in your filename.
     where = NULL;
@@ -97,146 +104,10 @@ Metos3DUtilFormatParse(Metos3D *metos3d, char *string)
         *where = '%';
         PetscStrchr(string, '$', &where);            
     }
+    // debug stop
     Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DUtilFormatParse", "format:", string);
     PetscFunctionReturn(0);
 }
-
-#undef  __FUNCT__
-#define __FUNCT__ "Metos3DUtilVecCopySeparateToDiagonal"
-PetscErrorCode
-Metos3DUtilVecCopySeparateToDiagonal(Metos3D *metos3d, PetscInt n, PetscInt nvecloc, Vec *y, Vec *yBD)
-{
-    // geometry
-    PetscInt        nprofloc    = metos3d->profileCountLocal;
-    PetscInt        *istartloc  = metos3d->profileStartLocal;
-    PetscInt        *iendloc    = metos3d->profileEndLocal;
-    // work vars
-    PetscInt        i, iprof, ii, length;
-    PetscScalar     **yarray;
-    PetscScalar     *yarrayBD;
-    PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DUtilVecCopySeparateToDiagonal\n");
-    // get arrays
-    VecGetArrays(y, n, &yarray);
-    VecGetArray(*yBD, &yarrayBD);
-    for (i = 0; i < n; i++) {
-        for (iprof = 0; iprof < nprofloc; iprof++) {
-            // length
-            length = iendloc[iprof]-istartloc[iprof]+1;
-            // start, end are 1 indexed
-            for (ii = 0; ii < length; ii++) {
-                yarrayBD[i*length + ii + n*(istartloc[iprof]-1)] = yarray[i][ii + istartloc[iprof]-1];
-            }
-        }
-    }
-    // restore arrays
-    VecRestoreArrays(y, n, &yarray);
-    VecRestoreArray(*yBD, &yarrayBD);    
-    PetscFunctionReturn( 0 );
-}
-
-#undef  __FUNCT__
-#define __FUNCT__ "Metos3DUtilVecCopyDiagonalToSeparate"
-PetscErrorCode
-Metos3DUtilVecCopyDiagonalToSeparate(Metos3D *metos3d, PetscInt n, PetscInt nvecloc, Vec *yBD, Vec *y)
-{
-    // geometry
-    PetscInt        nprofloc    = metos3d->profileCountLocal;
-    PetscInt        *istartloc  = metos3d->profileStartLocal;
-    PetscInt        *iendloc    = metos3d->profileEndLocal;
-    // work vars
-    PetscInt        i, iprof, ii, length;
-    PetscScalar     **yarray;
-    PetscScalar     *yarrayBD;
-    PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DUtilVecCopyDiagonalToSeparate\n");
-    // get arrays
-    VecGetArray(*yBD, &yarrayBD);
-    VecGetArrays(y, n, &yarray);
-    for (i = 0; i < n; i++) {
-        for (iprof = 0; iprof < nprofloc; iprof++) {
-            // length
-            length = iendloc[iprof]-istartloc[iprof]+1;
-            // start, end are 1 indexed
-            for (ii = 0; ii < length; ii++) {
-                yarray[i][ii + istartloc[iprof]-1] = yarrayBD[i*length + ii + n*(istartloc[iprof]-1)];
-            }
-        }
-    }
-    // restore arrays
-    VecRestoreArray(*yBD, &yarrayBD);    
-    VecRestoreArrays(y, n, &yarray);
-    PetscFunctionReturn( 0 );
-}
-
-#undef  __FUNCT__
-#define __FUNCT__ "Metos3DUtilVecCopySeparateToDiagonalProfile"
-PetscErrorCode
-Metos3DUtilVecCopySeparateToDiagonalProfile(Metos3D *metos3d, PetscInt n, PetscInt nloc, Vec *y, Vec *yBD)
-{
-    // work vars
-    PetscInt        i, iloc;
-    PetscScalar     **yarray;
-    PetscScalar     *yarrayBD;
-    PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DUtilVecCopySeparateToDiagonalProfile\n");
-    // get arrays
-    VecGetArrays(y, n, &yarray);
-    VecGetArray(*yBD, &yarrayBD);
-    for (i = 0; i < n; i++) {
-        for (iloc = 0; iloc < nloc; iloc++ ) {
-            yarrayBD[i + n*iloc] = yarray[i][iloc];
-        }
-    }
-    VecRestoreArrays(y, n, &yarray);
-    VecRestoreArray(*yBD, &yarrayBD);    
-    PetscFunctionReturn( 0 );
-}
-
-#undef  __FUNCT__
-#define __FUNCT__ "Metos3DUtilVecCreateAndSetValue"
-PetscErrorCode
-Metos3DUtilVecCreateAndSetValue(Metos3D *metos3d, PetscInt ntracer, PetscInt nvec, PetscInt nvecloc, Vec **v, PetscScalar val)
-{
-    MPI_Comm    comm = metos3d->comm;
-    // work vars
-    PetscInt    itracer;
-    PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DUtilVecCreateAndSetValue\n");
-    // create array
-    PetscMalloc(ntracer*sizeof(Vec), v);
-    for (itracer = 0; itracer < ntracer; itracer++)
-    {
-        // create vector
-        VecCreateMPI(comm, nvecloc, nvec, &(*v)[itracer]);
-        VecSet((*v)[itracer], val);
-        VecAssemblyBegin((*v)[itracer]);
-        VecAssemblyEnd  ((*v)[itracer]);        
-    }
-    PetscFunctionReturn(0);
-}    
-
-#undef  __FUNCT__
-#define __FUNCT__ "Metos3DUtilVecCreateAndSetValues"
-PetscErrorCode
-Metos3DUtilVecCreateAndSetValues(Metos3D *metos3d, PetscInt ntracer, PetscInt nvec, PetscInt nvecloc, Vec **v, PetscScalar *val)
-{
-    MPI_Comm    comm = metos3d->comm;
-    // work vars
-    PetscInt    itracer;
-    PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DUtilVecCreateAndSetValues\n");
-    //
-    PetscMalloc(ntracer*sizeof(Vec), v);
-    for (itracer = 0; itracer < ntracer; itracer++)
-    {        
-        VecCreateMPI(comm, nvecloc, nvec, &(*v)[itracer]);
-        VecSet((*v)[itracer], val[itracer]);
-        VecAssemblyBegin((*v)[itracer]);
-        VecAssemblyEnd((*v)[itracer]);
-    }
-    PetscFunctionReturn(0);
-}    
 
 /*
  *  Metos3DUtilMatrixLoadAndCreate
@@ -268,7 +139,8 @@ Metos3DUtilMatrixLoadAndCreate(Metos3D *metos3d, char *filePath, Mat *A)
     PetscInt        *n_col_per_row_loc, *nnz_all, *jj;
     PetscScalar     *aa;
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DUtilMatrixLoadAndCreate", "filePath:", filePath);
+//    // debug start
+//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // fd1 open, read header
     PetscBinaryOpen(filePath, FILE_MODE_READ, &fd1);
     PetscBinaryRead(fd1, (void*)header, 4, PETSC_INT);
@@ -330,7 +202,8 @@ Metos3DUtilMatrixLoadAndCreate(Metos3D *metos3d, char *filePath, Mat *A)
     // close files
     PetscBinaryClose(fd1);
     PetscBinaryClose(fd2);
-    // end clean
+    // debug stop
+    Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DUtilMatrixLoadAndCreate", "filePath:", filePath);
     PetscFunctionReturn( 0 );
 }
 
@@ -342,9 +215,12 @@ Metos3DUtilOptionsGetInt(Metos3D *metos3d, const char *optionName, PetscInt *iva
     PetscBool   flag = PETSC_FALSE;
     char        message[PETSC_MAX_PATH_LEN];
     PetscFunctionBegin;
+//    // debug start
+//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     PetscOptionsGetInt(PETSC_NULL, optionName, ivalue, &flag);
     sprintf(message, "Please provide the '%s' option", optionName);
     Metos3DFlag(flag, message);
+    // debug stop
     Metos3DDebug(metos3d, kDebugLevel, F4SD, "Metos3DUtilOptionsGetInt", "optionName:", optionName, "value:", *ivalue);
     PetscFunctionReturn(0);
 }
@@ -356,9 +232,12 @@ Metos3DUtilOptionsGetScalar(Metos3D *metos3d, const char *optionName, PetscScala
     PetscBool   flag = PETSC_FALSE;
     char        message[PETSC_MAX_PATH_LEN];
     PetscFunctionBegin;
+//    // debug start
+//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     PetscOptionsGetScalar(PETSC_NULL, optionName, dvalue, &flag);
     sprintf(message, "Please provide the '%s' option", optionName);
     Metos3DFlag(flag, message);    
+    // debug stop
     Metos3DDebug(metos3d, kDebugLevel, F4SE, "Metos3DUtilOptionsGetScalar", "optionName:", optionName, "value:", *dvalue);
     PetscFunctionReturn(0);
 }
@@ -372,6 +251,8 @@ Metos3DUtilOptionsGetRealArray(Metos3D *metos3d, const char *optionName, PetscIn
     char        message[PETSC_MAX_PATH_LEN];
     PetscInt    i;
     PetscFunctionBegin;
+//    // debug start
+//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     PetscOptionsGetRealArray(PETSC_NULL, optionName, dvalue, nmax, &flag);
     sprintf(message, "Please provide the '%s' option", optionName);
     Metos3DFlag(flag, message);
@@ -379,6 +260,7 @@ Metos3DUtilOptionsGetRealArray(Metos3D *metos3d, const char *optionName, PetscIn
     {
         Metos3DDebug(metos3d, kDebugLevel, F4SE, "Metos3DUtilOptionsGetRealArray", "optionName:", optionName, "value:", dvalue[i]);
     }
+    // debug stop
     PetscFunctionReturn(0);
 }
 
@@ -389,13 +271,171 @@ Metos3DUtilOptionsGetString(Metos3D *metos3d, const char *optionName, char *stri
 {
     PetscBool   flag = PETSC_FALSE;
     char        message[PETSC_MAX_PATH_LEN];
-    PetscFunctionBegin;    
+    PetscFunctionBegin;
+//    // debug start
+//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     PetscOptionsGetString(PETSC_NULL, optionName, string, PETSC_MAX_PATH_LEN, &flag);
     sprintf(message, "Please provide the '%s' option", optionName);
     Metos3DFlag(flag, message);    
+    // debug stop
     Metos3DDebug(metos3d, kDebugLevel, F5S, "Metos3DUtilOptionsGetString", "optionName:", optionName, "value:", string);
     PetscFunctionReturn(0);
 }
+
+#undef  kDebugLevel
+#define kDebugLevel kDebugLevel4
+
+#undef  __FUNCT__
+#define __FUNCT__ "Metos3DUtilVecCopySeparateToDiagonal"
+PetscErrorCode
+Metos3DUtilVecCopySeparateToDiagonal(Metos3D *metos3d, PetscInt n, PetscInt nvecloc, Vec *y, Vec *yBD)
+{
+    // geometry
+    PetscInt        nprofloc    = metos3d->profileCountLocal;
+    PetscInt        *istartloc  = metos3d->profileStartLocal;
+    PetscInt        *iendloc    = metos3d->profileEndLocal;
+    // work vars
+    PetscInt        i, iprof, ii, length;
+    PetscScalar     **yarray;
+    PetscScalar     *yarrayBD;
+    PetscFunctionBegin;
+    //    // debug start
+    //    PetscGetTime(&metos3d->startTime[kDebugLevel]);
+    // get arrays
+    VecGetArrays(y, n, &yarray);
+    VecGetArray(*yBD, &yarrayBD);
+    for (i = 0; i < n; i++) {
+        for (iprof = 0; iprof < nprofloc; iprof++) {
+            // length
+            length = iendloc[iprof]-istartloc[iprof]+1;
+            // start, end are 1 indexed
+            for (ii = 0; ii < length; ii++) {
+                yarrayBD[i*length + ii + n*(istartloc[iprof]-1)] = yarray[i][ii + istartloc[iprof]-1];
+            }
+        }
+    }
+    // restore arrays
+    VecRestoreArrays(y, n, &yarray);
+    VecRestoreArray(*yBD, &yarrayBD);
+    // debug stop
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DUtilVecCopySeparateToDiagonal\n");
+    PetscFunctionReturn( 0 );
+}
+
+#undef  __FUNCT__
+#define __FUNCT__ "Metos3DUtilVecCopyDiagonalToSeparate"
+PetscErrorCode
+Metos3DUtilVecCopyDiagonalToSeparate(Metos3D *metos3d, PetscInt n, PetscInt nvecloc, Vec *yBD, Vec *y)
+{
+    // geometry
+    PetscInt        nprofloc    = metos3d->profileCountLocal;
+    PetscInt        *istartloc  = metos3d->profileStartLocal;
+    PetscInt        *iendloc    = metos3d->profileEndLocal;
+    // work vars
+    PetscInt        i, iprof, ii, length;
+    PetscScalar     **yarray;
+    PetscScalar     *yarrayBD;
+    PetscFunctionBegin;
+    //    // debug start
+    //    PetscGetTime(&metos3d->startTime[kDebugLevel]);
+    // get arrays
+    VecGetArray(*yBD, &yarrayBD);
+    VecGetArrays(y, n, &yarray);
+    for (i = 0; i < n; i++) {
+        for (iprof = 0; iprof < nprofloc; iprof++) {
+            // length
+            length = iendloc[iprof]-istartloc[iprof]+1;
+            // start, end are 1 indexed
+            for (ii = 0; ii < length; ii++) {
+                yarray[i][ii + istartloc[iprof]-1] = yarrayBD[i*length + ii + n*(istartloc[iprof]-1)];
+            }
+        }
+    }
+    // restore arrays
+    VecRestoreArray(*yBD, &yarrayBD);
+    VecRestoreArrays(y, n, &yarray);
+    // debug stop
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DUtilVecCopyDiagonalToSeparate\n");
+    PetscFunctionReturn( 0 );
+}
+
+#undef  __FUNCT__
+#define __FUNCT__ "Metos3DUtilVecCopySeparateToDiagonalProfile"
+PetscErrorCode
+Metos3DUtilVecCopySeparateToDiagonalProfile(Metos3D *metos3d, PetscInt n, PetscInt nloc, Vec *y, Vec *yBD)
+{
+    // work vars
+    PetscInt        i, iloc;
+    PetscScalar     **yarray;
+    PetscScalar     *yarrayBD;
+    PetscFunctionBegin;
+    //    // debug start
+    //    PetscGetTime(&metos3d->startTime[kDebugLevel]);
+    // get arrays
+    VecGetArrays(y, n, &yarray);
+    VecGetArray(*yBD, &yarrayBD);
+    for (i = 0; i < n; i++) {
+        for (iloc = 0; iloc < nloc; iloc++ ) {
+            yarrayBD[i + n*iloc] = yarray[i][iloc];
+        }
+    }
+    VecRestoreArrays(y, n, &yarray);
+    VecRestoreArray(*yBD, &yarrayBD);
+    // debug stop
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DUtilVecCopySeparateToDiagonalProfile\n");
+    PetscFunctionReturn( 0 );
+}
+
+#undef  __FUNCT__
+#define __FUNCT__ "Metos3DUtilVecCreateAndSetValue"
+PetscErrorCode
+Metos3DUtilVecCreateAndSetValue(Metos3D *metos3d, PetscInt ntracer, PetscInt nvec, PetscInt nvecloc, Vec **v, PetscScalar val)
+{
+    MPI_Comm    comm = metos3d->comm;
+    // work vars
+    PetscInt    itracer;
+    PetscFunctionBegin;
+    //    // debug start
+    //    PetscGetTime(&metos3d->startTime[kDebugLevel]);
+    // create array
+    PetscMalloc(ntracer*sizeof(Vec), v);
+    for (itracer = 0; itracer < ntracer; itracer++)
+    {
+        // create vector
+        VecCreateMPI(comm, nvecloc, nvec, &(*v)[itracer]);
+        VecSet((*v)[itracer], val);
+        VecAssemblyBegin((*v)[itracer]);
+        VecAssemblyEnd  ((*v)[itracer]);
+    }
+    // debug stop
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DUtilVecCreateAndSetValue\n");
+    PetscFunctionReturn(0);
+}
+
+#undef  __FUNCT__
+#define __FUNCT__ "Metos3DUtilVecCreateAndSetValues"
+PetscErrorCode
+Metos3DUtilVecCreateAndSetValues(Metos3D *metos3d, PetscInt ntracer, PetscInt nvec, PetscInt nvecloc, Vec **v, PetscScalar *val)
+{
+    MPI_Comm    comm = metos3d->comm;
+    // work vars
+    PetscInt    itracer;
+    PetscFunctionBegin;
+    //    // debug start
+    //    PetscGetTime(&metos3d->startTime[kDebugLevel]);
+    //
+    PetscMalloc(ntracer*sizeof(Vec), v);
+    for (itracer = 0; itracer < ntracer; itracer++)
+    {
+        VecCreateMPI(comm, nvecloc, nvec, &(*v)[itracer]);
+        VecSet((*v)[itracer], val[itracer]);
+        VecAssemblyBegin((*v)[itracer]);
+        VecAssemblyEnd((*v)[itracer]);
+    }
+    // debug stop
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DUtilVecCreateAndSetValues\n");
+    PetscFunctionReturn(0);
+}    
 
 #undef  __FUNCT__
 #define __FUNCT__ "Metos3DUtilInterpolate"
@@ -403,6 +443,8 @@ PetscErrorCode
 Metos3DUtilInterpolate(Metos3D *metos3d, PetscReal t, PetscInt N, PetscInt *i_alpha, PetscScalar *alpha, PetscInt *i_beta, PetscScalar *beta)
 {
     PetscFunctionBegin;
+//    // debug start
+//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // we assume t is (t mod 1.0)!
     if (N > 1) {
         // work vars
@@ -418,6 +460,7 @@ Metos3DUtilInterpolate(Metos3D *metos3d, PetscReal t, PetscInt N, PetscInt *i_al
         *beta       = 0.0;
         *alpha      = 1.0;        
     }
+    // debug stop
     Metos3DDebug(metos3d, kDebugLevel, FS2SESD, "Metos3DUtilInterpolate", "alpha:", *alpha, "i_alpha:", *i_alpha, "beta:", *beta, "i_beta:", *i_beta);
     PetscFunctionReturn(0);
 }

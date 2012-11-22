@@ -10,3 +10,5 @@ v0.2rc3
 
 2. changed signature of Metos3DDebug to: Metos3DDebug(Metos3D *metos3d, PetscInt level, const char *format, ...)
 2.1 changed ALL calls to Metos3DDebug
+
+3. Timing built in now

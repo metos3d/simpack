@@ -21,9 +21,8 @@
 
 #include "metos3d_geometry.h"
 
-#pragma mark -
 #undef  kDebugLevel
-#define kDebugLevel kDebugLevel3
+#define kDebugLevel kDebugLevel2
 
 #undef  __FUNCT__
 #define __FUNCT__ "Metos3DGeometryInit"
@@ -51,6 +50,8 @@ Metos3DGeometryInit(Metos3D *metos3d)
     char        geometryType[PETSC_MAX_PATH_LEN];    
     PetscBool   flag;
     PetscFunctionBegin;
+//    // debug start
+//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // geometry type
     Metos3DUtilOptionsGetString(metos3d, "-Metos3DGeometryType", geometryType);
     PetscStrcmp("Profile", geometryType, &flag);
@@ -71,13 +72,13 @@ Metos3DGeometryInit(Metos3D *metos3d)
         // get start indices (1 indexed)
         // concat file path
         sprintf(filePath, "%s%s", geometryInputDirectory, profileStartFile);
-        Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DGeometryInit", "filePath:", filePath);
+//        Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DGeometryInit", "filePath:", filePath);
         PetscViewerBinaryOpen(comm, filePath, FILE_MODE_READ, &viewer);
         // read profile count
         PetscViewerBinaryRead(viewer, (void*)&profileCount, 1, PETSC_INT);
         // store
         metos3d->profileCount = profileCount;
-        Metos3DDebug(metos3d, kDebugLevel, F2SD, "Metos3DGeometryInit", "profileCount:", profileCount);
+//        Metos3DDebug(metos3d, kDebugLevel, F2SD, "Metos3DGeometryInit", "profileCount:", profileCount);
         PetscMalloc(profileCount*sizeof(PetscInt), &metos3d->profileStart);
         // read all indices
         PetscViewerBinaryRead(viewer, (void*)metos3d->profileStart, profileCount, PETSC_INT);
@@ -85,13 +86,13 @@ Metos3DGeometryInit(Metos3D *metos3d)
         // get end indices (1 indexed)
         // concat file path
         sprintf(filePath, "%s%s", geometryInputDirectory, profileEndFile);
-        Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DGeometryInit", "filePath:", filePath);
+//        Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DGeometryInit", "filePath:", filePath);
         PetscViewerBinaryOpen(comm, filePath, FILE_MODE_READ, &viewer);
         // read profile count
         PetscViewerBinaryRead(viewer, (void*)&profileCount, 1, PETSC_INT);
         // store
         metos3d->profileCount = profileCount;
-        Metos3DDebug(metos3d, kDebugLevel, F2SD, "Metos3DGeometryInit", "profileCount:", profileCount);
+//        Metos3DDebug(metos3d, kDebugLevel, F2SD, "Metos3DGeometryInit", "profileCount:", profileCount);
         PetscMalloc(profileCount*sizeof(PetscInt), &metos3d->profileEnd);
         // read all indices
         PetscViewerBinaryRead(viewer, (void*)metos3d->profileEnd, profileCount, PETSC_INT);
@@ -100,7 +101,7 @@ Metos3DGeometryInit(Metos3D *metos3d)
         vectorLength = metos3d->profileEnd[profileCount-1];
         // store
         metos3d->vectorLength = vectorLength;
-        Metos3DDebug(metos3d, kDebugLevel, F2SD, "Metos3DGeometryInit", "vectorLength:", vectorLength);
+//        Metos3DDebug(metos3d, kDebugLevel, F2SD, "Metos3DGeometryInit", "vectorLength:", vectorLength);
         // determine max length of profile
         nlayermax = 0;
         for (iprof = 0; iprof < profileCount; iprof++) {
@@ -108,10 +109,10 @@ Metos3DGeometryInit(Metos3D *metos3d)
         }
         // store
         metos3d->profileLengthMax = nlayermax;
-        Metos3DDebug(metos3d, kDebugLevel, F2SD, "Metos3DGeometryInit", "profileLengthMax:", nlayermax);
+//        Metos3DDebug(metos3d, kDebugLevel, F2SD, "Metos3DGeometryInit", "profileLengthMax:", nlayermax);
     }
-    // debug
-    Metos3DDebug(metos3d, kDebugLevel2, "Metos3DGeometryInit\n");
+    // debug stop
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DGeometryInit\n");
     PetscFunctionReturn(0);
 }
 
@@ -124,7 +125,8 @@ Metos3DGeometryFinal(Metos3D *metos3d)
     char        geometryType[PETSC_MAX_PATH_LEN];    
     PetscBool   flag;
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel2, "Metos3DGeometryFinal\n");
+//    // debug start
+//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // geometry
     Metos3DUtilOptionsGetString(metos3d, "-Metos3DGeometryType", geometryType);
     PetscStrcmp("Profile", geometryType, &flag);
@@ -132,6 +134,7 @@ Metos3DGeometryFinal(Metos3D *metos3d)
         PetscFree(metos3d->profileStart);
         PetscFree(metos3d->profileEnd);
     }
-    
+    // debug stop
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DGeometryFinal\n");    
     PetscFunctionReturn(0);
 }

@@ -36,7 +36,7 @@ typedef struct {
     MPI_Comm        comm;
     // debug
     PetscInt        debugLevel;
-    PetscLogDouble  startTime[4];
+    PetscLogDouble  startTime[5];                           // for debug level 0 to 4
     PetscInt        fileFormatPrefixCount;
     char            *fileFormatPrefix[PETSC_MAX_PATH_LEN];
     char            *filePrefix;

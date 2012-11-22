@@ -21,9 +21,8 @@
 
 #include "metos3d_load.h"
 
-#pragma mark -
 #undef  kDebugLevel
-#define kDebugLevel kDebugLevel3
+#define kDebugLevel kDebugLevel2
 
 #undef  __FUNCT__
 #define __FUNCT__ "Metos3DLoadInit"
@@ -43,13 +42,15 @@ Metos3DLoadInit(Metos3D *metos3d)
     PetscInt    nvecloc, nvecprev, nprofloc, nprofprev;
     PetscInt    *istartloc, *iendloc;
     PetscFunctionBegin;
+//    // debug start
+//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // determine process count and my process number
     MPI_Comm_size(comm, &nproc);
     MPI_Comm_rank(comm, &myproc);
     // store
     metos3d->processCount = nproc;
     metos3d->processMine = myproc;
-    Metos3DDebug(metos3d, kDebugLevel, F2SD, "Metos3DLoadInit", "processCount:", nproc);
+//    Metos3DDebug(metos3d, kDebugLevel, F2SD, "Metos3DLoadInit", "processCount:", nproc);
     // compute simple load distribution
     PetscMalloc(nproc*sizeof(PetscInt), &sumvecloc);
     PetscMalloc(nproc*sizeof(PetscInt), &sumvecprev);
@@ -104,10 +105,11 @@ Metos3DLoadInit(Metos3D *metos3d)
     metos3d->profileStartLocal      = istartloc;
     metos3d->profileEndLocal        = iendloc;
     // debug
-    Metos3DSynchronizedDebug11(debug, 3, comm, SYNCFS5SD, "Metos3DLoadInit", "myproc:", myproc,
+    Metos3DSynchronizedDebug11(debug, kDebugLevel3, comm, SYNCFS5SD, "Metos3DLoadInit", "myproc:", myproc,
         "nvecloc:", nvecloc, "nvecprev:", nvecprev, "nprofloc:", nprofloc, "nprofprev:", nprofprev);
     PetscSynchronizedFlush(comm);
-    Metos3DDebug(metos3d, kDebugLevel2, "Metos3DLoadInit\n");
+    // debug stop
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DLoadInit\n");
     PetscFunctionReturn(0);
 }
 
@@ -117,9 +119,12 @@ PetscErrorCode
 Metos3DLoadFinal(Metos3D *metos3d)
 {
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel2, "Metos3DLoadFinal\n");
+//    // debug start
+//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // local indices
     PetscFree(metos3d->profileStartLocal);
     PetscFree(metos3d->profileEndLocal);
+    // debug stop
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DLoadFinal\n");
     PetscFunctionReturn(0);
 }

@@ -21,7 +21,6 @@
 
 #include "metos3d_timestep.h"
 
-#pragma mark -
 #undef  kDebugLevel
 #define kDebugLevel kDebugLevel2
 
@@ -31,11 +30,14 @@ PetscErrorCode
 Metos3DTimeStepInit(Metos3D *metos3d)
 {
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DTimeStepInit\n");
+//    // debug start
+//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // options
     Metos3DUtilOptionsGetScalar(metos3d, "-Metos3DTimeStep", &metos3d->timeStep);
     Metos3DUtilOptionsGetScalar(metos3d, "-Metos3DTimeStepStart", &metos3d->timeStepStart);
     Metos3DUtilOptionsGetInt(metos3d, "-Metos3DTimeStepCount", &metos3d->timeStepCount);
+    // debug stop
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DTimeStepInit\n");
     PetscFunctionReturn(0);
 }
 
@@ -45,9 +47,15 @@ PetscErrorCode
 Metos3DTimeStepFinal(Metos3D *metos3d)
 {
     PetscFunctionBegin;
+//    // debug start
+//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
+    // debug stop
     Metos3DDebug(metos3d, kDebugLevel, "Metos3DTimeStepFinal\n");
     PetscFunctionReturn(0);
 }
+
+#undef  kDebugLevel
+#define kDebugLevel kDebugLevel3
 
 #undef  __FUNCT__
 #define __FUNCT__ "Metos3DTimeStepFunction"
@@ -68,7 +76,6 @@ Metos3DTimeStepFunction(SNES snes, Vec ynBD, Vec fnBD, void *ctx)
     PetscInt    itracer;
     Vec         *yin, *yinold, *yout;
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DTimeStepFunction\n");
     // wait for all processors  
     PetscBarrier(PETSC_NULL);
     // create work vectors
@@ -91,6 +98,7 @@ Metos3DTimeStepFunction(SNES snes, Vec ynBD, Vec fnBD, void *ctx)
     VecDestroyVecs(ntracer, &yout);
     // wait for all processors  
     PetscBarrier(PETSC_NULL);
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DTimeStepFunction\n");
     PetscFunctionReturn(0);
 }
 
@@ -115,7 +123,6 @@ Metos3DTimeStepPhi(Metos3D *metos3d, Vec *yin, Vec *yout, PetscInt nparam, Petsc
     PetscInt    itracer, istep;
     Vec         *ywork;
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DTimeStepPhi\n");
     // prepare work vector
     VecDuplicateVecs(*yin, ntracer, &ywork);
     // init
@@ -169,12 +176,9 @@ Metos3DTimeStepPhi(Metos3D *metos3d, Vec *yin, Vec *yout, PetscInt nparam, Petsc
     Metos3DBGCStepFinal(metos3d, t, dt, ybgcinBD, ybgcoutBD, nparam, u0);
     // free work vector
     VecDestroyVecs(ntracer, &ywork);
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DTimeStepPhi\n");
     PetscFunctionReturn(0);
 }
-
-#pragma mark -
-#undef  kDebugLevel
-#define kDebugLevel kDebugLevel3
 
 #undef  __FUNCT__
 #define __FUNCT__ "Metos3DTimeStepPhiStep"
@@ -196,7 +200,6 @@ Metos3DTimeStepPhiStep(Metos3D *metos3d, PetscScalar t, PetscScalar dt, PetscInt
     // work vars
     PetscInt    itracer;
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, FSSDSE, "Metos3DTimeStepPhiStep", "istep:", istep, "t:", t);
     // bgc
     // ybgcinBD  = yin
     // ybgcoutBD = 0
@@ -213,5 +216,6 @@ Metos3DTimeStepPhiStep(Metos3D *metos3d, PetscScalar t, PetscScalar dt, PetscInt
     Metos3DTransport(metos3d, t, nmat, Ae, ntracer, yin, ywork, Aework);
     for (itracer = 0; itracer < ntracer; itracer++) VecAXPY(ywork[itracer], 1.0, yout[itracer]);
     Metos3DTransport(metos3d, t, nmat, Ai, ntracer, ywork, yout, Aiwork);
+    Metos3DDebug(metos3d, kDebugLevel, FSSDSE, "Metos3DTimeStepPhiStep", "istep:", istep, "t:", t);
     PetscFunctionReturn(0);
 }

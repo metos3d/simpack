@@ -21,9 +21,8 @@
 
 #include "metos3d_bgc.h"
 
-#pragma mark -
 #undef  kDebugLevel
-#define kDebugLevel kDebugLevel3
+#define kDebugLevel kDebugLevel2
 
 #undef  __FUNCT__
 #define __FUNCT__ "Metos3DBGCInit"
@@ -31,15 +30,38 @@ PetscErrorCode
 Metos3DBGCInit(Metos3D *metos3d)
 {
     PetscFunctionBegin;
+//    // debug start
+//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // init tracer, boundary, domain, parameter
     Metos3DBGCTracerInit(metos3d);
     Metos3DBGCParameterInit(metos3d);
     Metos3DBGCBoundaryConditionInit(metos3d);
     Metos3DBGCDomainConditionInit(metos3d);
-    // debug
-    Metos3DDebug(metos3d, kDebugLevel2, "Metos3DBGCInit\n");
+    // debug stop
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCInit\n");
     PetscFunctionReturn(0);
 }
+
+#undef  __FUNCT__
+#define __FUNCT__ "Metos3DBGCFinal"
+PetscErrorCode
+Metos3DBGCFinal(Metos3D *metos3d)
+{
+    PetscFunctionBegin;
+//    // debug start
+//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
+    // final parameter, domain, boundary, tracer
+    Metos3DBGCDomainConditionFinal(metos3d);
+    Metos3DBGCBoundaryConditionFinal(metos3d);
+    Metos3DBGCParameterFinal(metos3d);
+    Metos3DBGCTracerFinal(metos3d);
+    // debug stop
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCFinal\n");
+    PetscFunctionReturn(0);
+}
+
+#undef  kDebugLevel
+#define kDebugLevel kDebugLevel3
 
 #undef  __FUNCT__
 #define __FUNCT__ "Metos3DBGCTracerInit"
@@ -55,7 +77,6 @@ Metos3DBGCTracerInit(Metos3D *metos3d)
     PetscBool   flag;
     char        initFileNameFormat  [PETSC_MAX_PATH_LEN];
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCTracerInit\n");
     // tracer count
     Metos3DUtilOptionsGetInt(metos3d, "-Metos3DTracerCount", &ntracer);
     metos3d->tracerCount = ntracer;
@@ -116,6 +137,7 @@ Metos3DBGCTracerInit(Metos3D *metos3d)
     // create work vectors
     Metos3DUtilVecCreateAndSetValue(metos3d, 1, ntracer*nvec, ntracer*nvecloc, &metos3d->ybgcinBD, 0.0);
     Metos3DUtilVecCreateAndSetValue(metos3d, 1, ntracer*nvec, ntracer*nvecloc, &metos3d->ybgcoutBD, 0.0);
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCTracerInit\n");
     PetscFunctionReturn(0);
 }
 
@@ -127,7 +149,6 @@ Metos3DBGCParameterInit(Metos3D *metos3d)
     // work vars
     PetscInt    nparam;
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCParameterInit\n");
     // parameter count
     Metos3DUtilOptionsGetInt(metos3d, "-Metos3DParameterCount", &nparam);
     metos3d->parameterCount = nparam;
@@ -139,6 +160,7 @@ Metos3DBGCParameterInit(Metos3D *metos3d)
         PetscMalloc(nmax*sizeof(PetscReal),&metos3d->u0);
         Metos3DUtilOptionsGetRealArray(metos3d, "-Metos3DParameterValue", &nmax, metos3d->u0);
     }
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCParameterInit\n");
     PetscFunctionReturn(0);
 }
 
@@ -150,7 +172,6 @@ Metos3DBGCBoundaryConditionInit(Metos3D *metos3d)
     // work vars
     PetscInt    nbc;
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCBoundaryConditionInit\n");
     // count
     Metos3DUtilOptionsGetInt(metos3d, "-Metos3DBoundaryConditionCount", &nbc);
     metos3d->boundaryConditionCount = nbc;
@@ -209,6 +230,7 @@ Metos3DBGCBoundaryConditionInit(Metos3D *metos3d)
         Metos3DUtilVecCreateAndSetValue(metos3d, nbc, nprof, nprofloc, &metos3d->bgcbc, 0.0);
         Metos3DUtilVecCreateAndSetValue(metos3d, 1, nbc*nprof, nbc*nprofloc, &metos3d->bgcbcBD, 0.0);
     }
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCBoundaryConditionInit\n");
     PetscFunctionReturn(0);
 }
 
@@ -220,7 +242,6 @@ Metos3DBGCDomainConditionInit(Metos3D *metos3d)
     // work vars
     PetscInt    ndc;
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCDomainConditionInit\n");
     // count
     Metos3DUtilOptionsGetInt(metos3d, "-Metos3DDomainConditionCount", &ndc);
     metos3d->domainConditionCount = ndc;
@@ -279,22 +300,7 @@ Metos3DBGCDomainConditionInit(Metos3D *metos3d)
         Metos3DUtilVecCreateAndSetValue(metos3d, ndc, nvec, nvecloc, &metos3d->bgcdc, 0.0);
         Metos3DUtilVecCreateAndSetValue(metos3d, 1, ndc*nvec, ndc*nvecloc, &metos3d->bgcdcBD, 0.0);
     }
-    PetscFunctionReturn(0);
-}
-
-#undef  __FUNCT__
-#define __FUNCT__ "Metos3DBGCFinal"
-PetscErrorCode
-Metos3DBGCFinal(Metos3D *metos3d)
-{
-    PetscFunctionBegin;
-    // final parameter, domain, boundary, tracer
-    Metos3DBGCDomainConditionFinal(metos3d);
-    Metos3DBGCBoundaryConditionFinal(metos3d);
-    Metos3DBGCParameterFinal(metos3d);
-    Metos3DBGCTracerFinal(metos3d);
-    // debug
-    Metos3DDebug(metos3d, kDebugLevel2, "Metos3DBGCFinal\n");
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCDomainConditionInit\n");
     PetscFunctionReturn(0);
 }
 
@@ -306,7 +312,6 @@ Metos3DBGCDomainConditionFinal(Metos3D *metos3d)
     // work vars
     PetscInt    ndc     = metos3d->domainConditionCount;
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCDomainConditionFinal\n");
     if (ndc > 0) {
         // work vars
         PetscInt    idc;
@@ -323,6 +328,7 @@ Metos3DBGCDomainConditionFinal(Metos3D *metos3d)
         VecDestroyVecs(ndc, &metos3d->bgcdc);
         VecDestroyVecs(1, &metos3d->bgcdcBD);
     }
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCDomainConditionFinal\n");
     PetscFunctionReturn(0);
 }
 
@@ -334,7 +340,6 @@ Metos3DBGCBoundaryConditionFinal(Metos3D *metos3d)
     // work vars
     PetscInt    nbc     = metos3d->boundaryConditionCount;
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCBoundaryConditionFinal\n");
     if (nbc > 0) {
         // work vars
         PetscInt    ibc;
@@ -353,6 +358,7 @@ Metos3DBGCBoundaryConditionFinal(Metos3D *metos3d)
         VecDestroyVecs(nbc, &metos3d->bgcbc);
         VecDestroyVecs(1, &metos3d->bgcbcBD);
     }
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCBoundaryConditionFinal\n");
     PetscFunctionReturn(0);
 }
 
@@ -364,10 +370,10 @@ Metos3DBGCParameterFinal(Metos3D *metos3d)
     // parameter
     PetscInt    nparam  = metos3d->parameterCount;
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCParameterFinal\n");
     if (nparam > 0) {
         PetscFree(metos3d->u0);    
-    }    
+    }
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCParameterFinal\n");
     PetscFunctionReturn(0);
 }
 
@@ -379,16 +385,15 @@ Metos3DBGCTracerFinal(Metos3D *metos3d)
     // bgc
     PetscInt    ntracer = metos3d->tracerCount;
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCTracerFinal\n");
     // initial value vector
     VecDestroyVecs(ntracer, &metos3d->y0);
     // work vectors
     VecDestroyVecs(1, &metos3d->ybgcinBD);
     VecDestroyVecs(1, &metos3d->ybgcoutBD);
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCTracerFinal\n");
     PetscFunctionReturn(0);
 }
 
-#pragma mark -
 #undef  kDebugLevel
 #define kDebugLevel kDebugLevel3
 
@@ -412,7 +417,6 @@ Metos3DBGCStepInit(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Ve
     PetscScalar *yinarray   = PETSC_NULL;
     PetscScalar *youtarray  = PETSC_NULL;
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, F2SE, "Metos3DBGCStepInit", "t:", t);
     // boundary condition step
     // domain condition step
     Metos3DBGCStepBoundaryCondition(metos3d, t);    
@@ -452,6 +456,7 @@ Metos3DBGCStepInit(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Ve
     if (ndc > 0) VecRestoreArray(*metos3d->bgcdcBD, &dcarray);
     VecRestoreArray(*yin, &yinarray);
     VecRestoreArray(*yout, &youtarray);
+    Metos3DDebug(metos3d, kDebugLevel, F2SE, "Metos3DBGCStepInit", "t:", t);
     PetscFunctionReturn(0);
 }
 
@@ -475,7 +480,6 @@ Metos3DBGCStepFinal(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, V
     PetscScalar *yinarray   = PETSC_NULL;
     PetscScalar *youtarray  = PETSC_NULL;
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, F2SE, "Metos3DBGCStepFinal", "t:", t);
     // boundary condition step
     // domain condition step
     Metos3DBGCStepBoundaryCondition(metos3d, t);
@@ -515,6 +519,7 @@ Metos3DBGCStepFinal(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, V
     if (ndc > 0) VecRestoreArray(*metos3d->bgcdcBD, &dcarray);
     VecRestoreArray(*yin, &yinarray);
     VecRestoreArray(*yout, &youtarray);
+    Metos3DDebug(metos3d, kDebugLevel, F2SE, "Metos3DBGCStepFinal", "t:", t);
     PetscFunctionReturn(0);
 }
 
@@ -538,7 +543,6 @@ Metos3DBGCStep(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Vec *y
     PetscScalar *yinarray   = PETSC_NULL;
     PetscScalar *youtarray  = PETSC_NULL;
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCStep\n");    
     // boundary condition step
     // domain condition step
     Metos3DBGCStepBoundaryCondition(metos3d, t);
@@ -578,82 +582,7 @@ Metos3DBGCStep(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Vec *y
     if (ndc > 0) VecRestoreArray(*metos3d->bgcdcBD, &dcarray);
     VecRestoreArray(*yin, &yinarray);
     VecRestoreArray(*yout, &youtarray);
-    PetscFunctionReturn(0);
-}
-
-#undef  __FUNCT__
-#define __FUNCT__ "Metos3DBGCStepBoundaryCondition"
-PetscErrorCode
-Metos3DBGCStepBoundaryCondition(Metos3D *metos3d, PetscScalar t)
-{
-    // bgc
-    PetscInt    nbc         = metos3d->boundaryConditionCount;
-    PetscInt    *nbcs       = metos3d->boundaryConditionCountArray;
-    Vec         **bcs       = metos3d->boundaryConditionArray;
-    Vec         *bgcbc      = metos3d->bgcbc;
-    // work vars
-    PetscInt    ibc;
-    PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCStepBoundaryCondition\n");
-    // check count
-    if (nbc > 0) {
-        // prepare boundary condition
-        for (ibc = 0; ibc < nbc; ibc++) {
-            // work vars
-            PetscInt    ialpha, ibeta;
-            PetscScalar alpha, beta;
-            // interpolate
-            Metos3DUtilInterpolate(metos3d, t, nbcs[ibc], &ialpha, &alpha, &ibeta, &beta);
-            // set
-            // bgcbc[ibc] = bcs[ibc][ialpha]
-            // bgcbc[ibc] = alpha*bgcbc[ibc]
-            // bgcbc[ibc] = bgcbc[ibc] + beta*bcs[ibc][ibeta]
-            VecCopy (bcs[ibc][ialpha], bgcbc[ibc]);
-            VecScale(bgcbc[ibc], alpha);
-            VecAXPY(bgcbc[ibc], beta, bcs[ibc][ibeta]);
-        }
-        // copy to one vector
-        PetscInt    nprofloc = metos3d->profileCountLocal;
-        Metos3DUtilVecCopySeparateToDiagonalProfile(metos3d, nbc, nprofloc, bgcbc, metos3d->bgcbcBD);
-    }
-    PetscFunctionReturn(0);
-}
-
-#undef  __FUNCT__
-#define __FUNCT__ "Metos3DBGCStepDomainCondition"
-PetscErrorCode
-Metos3DBGCStepDomainCondition(Metos3D *metos3d, PetscScalar t)
-{
-    // bgc
-    PetscInt    ndc         = metos3d->domainConditionCount;
-    PetscInt    *ndcs       = metos3d->domainConditionCountArray;
-    Vec         **dcs       = metos3d->domainConditionArray;
-    Vec         *bgcdc      = metos3d->bgcdc;
-    // work vars
-    PetscInt    idc;
-    PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCStepDomainCondition\n");
-    // check count
-    if (ndc > 0) {
-        // prepare boundary condition
-        for (idc = 0; idc < ndc; idc++) {
-            // work vars
-            PetscInt    ialpha, ibeta;
-            PetscScalar alpha, beta;
-            // interpolate
-            Metos3DUtilInterpolate(metos3d, t, ndcs[idc], &ialpha, &alpha, &ibeta, &beta);
-            // set
-            // bgcdc[idc] = dcs[idc][ialpha]
-            // bgcdc[idc] = alpha*bgcdc[idc]
-            // bgcdc[idc] = bgcdc[idc] + beta*dcs[idc][ibeta]
-            VecCopy (dcs[idc][ialpha], bgcdc[idc]);
-            VecScale(bgcdc[idc], alpha);
-            VecAXPY(bgcdc[idc], beta, dcs[idc][ibeta]);
-        }
-        // copy to one vector
-        PetscInt    nvecloc = metos3d->vectorLengthLocal;
-        Metos3DUtilVecCopySeparateToDiagonal(metos3d, ndc, nvecloc, bgcdc, metos3d->bgcdcBD);
-    }
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCStep\n");
     PetscFunctionReturn(0);
 }
 
@@ -669,9 +598,8 @@ Metos3DBGCOutput(Metos3D *metos3d, PetscInt n, Vec *v)
     char        *outputFileNames    [PETSC_MAX_PATH_LEN];
     char        outputFileNameFormat[PETSC_MAX_PATH_LEN];
     char        format              [PETSC_MAX_PATH_LEN];
-    char        filePath            [PETSC_MAX_PATH_LEN];    
+    char        filePath            [PETSC_MAX_PATH_LEN];
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCOutput\n");
     // output tracer vectors to disk
     Metos3DUtilOptionsGetString(metos3d, "-Metos3DTracerOutputDirectory", outputDirectory);
     PetscOptionsGetString(PETSC_NULL, "-Metos3DTracerOutputFileFormat", outputFileNameFormat, PETSC_MAX_PATH_LEN, &flag);
@@ -695,6 +623,7 @@ Metos3DBGCOutput(Metos3D *metos3d, PetscInt n, Vec *v)
             }
         }
     }
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCOutput\n");
     PetscFunctionReturn(0);
 }
 
@@ -710,9 +639,8 @@ Metos3DBGCOutputPrefix(Metos3D *metos3d, char *prefix, PetscInt n, Vec *v)
     char        *outputFileNames    [PETSC_MAX_PATH_LEN];
     char        outputFileNameFormat[PETSC_MAX_PATH_LEN];
     char        format              [PETSC_MAX_PATH_LEN];
-    char        filePath            [PETSC_MAX_PATH_LEN];    
+    char        filePath            [PETSC_MAX_PATH_LEN];
     PetscFunctionBegin;
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCOutputPrefix\n");
     // output tracer vectors to disk
     Metos3DUtilOptionsGetString(metos3d, "-Metos3DTracerOutputDirectory", outputDirectory);
     PetscOptionsGetString(PETSC_NULL, "-Metos3DTracerOutputFileFormat", outputFileNameFormat, PETSC_MAX_PATH_LEN, &flag);
@@ -736,6 +664,85 @@ Metos3DBGCOutputPrefix(Metos3D *metos3d, char *prefix, PetscInt n, Vec *v)
             }
         }
     }
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCOutputPrefix\n");
     PetscFunctionReturn(0);
 }
 
+#undef  kDebugLevel
+#define kDebugLevel kDebugLevel4
+
+#undef  __FUNCT__
+#define __FUNCT__ "Metos3DBGCStepBoundaryCondition"
+PetscErrorCode
+Metos3DBGCStepBoundaryCondition(Metos3D *metos3d, PetscScalar t)
+{
+    // bgc
+    PetscInt    nbc         = metos3d->boundaryConditionCount;
+    PetscInt    *nbcs       = metos3d->boundaryConditionCountArray;
+    Vec         **bcs       = metos3d->boundaryConditionArray;
+    Vec         *bgcbc      = metos3d->bgcbc;
+    // work vars
+    PetscInt    ibc;
+    PetscFunctionBegin;
+    // check count
+    if (nbc > 0) {
+        // prepare boundary condition
+        for (ibc = 0; ibc < nbc; ibc++) {
+            // work vars
+            PetscInt    ialpha, ibeta;
+            PetscScalar alpha, beta;
+            // interpolate
+            Metos3DUtilInterpolate(metos3d, t, nbcs[ibc], &ialpha, &alpha, &ibeta, &beta);
+            // set
+            // bgcbc[ibc] = bcs[ibc][ialpha]
+            // bgcbc[ibc] = alpha*bgcbc[ibc]
+            // bgcbc[ibc] = bgcbc[ibc] + beta*bcs[ibc][ibeta]
+            VecCopy (bcs[ibc][ialpha], bgcbc[ibc]);
+            VecScale(bgcbc[ibc], alpha);
+            VecAXPY(bgcbc[ibc], beta, bcs[ibc][ibeta]);
+        }
+        // copy to one vector
+        PetscInt    nprofloc = metos3d->profileCountLocal;
+        Metos3DUtilVecCopySeparateToDiagonalProfile(metos3d, nbc, nprofloc, bgcbc, metos3d->bgcbcBD);
+    }
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCStepBoundaryCondition\n");
+    PetscFunctionReturn(0);
+}
+
+#undef  __FUNCT__
+#define __FUNCT__ "Metos3DBGCStepDomainCondition"
+PetscErrorCode
+Metos3DBGCStepDomainCondition(Metos3D *metos3d, PetscScalar t)
+{
+    // bgc
+    PetscInt    ndc         = metos3d->domainConditionCount;
+    PetscInt    *ndcs       = metos3d->domainConditionCountArray;
+    Vec         **dcs       = metos3d->domainConditionArray;
+    Vec         *bgcdc      = metos3d->bgcdc;
+    // work vars
+    PetscInt    idc;
+    PetscFunctionBegin;
+    // check count
+    if (ndc > 0) {
+        // prepare boundary condition
+        for (idc = 0; idc < ndc; idc++) {
+            // work vars
+            PetscInt    ialpha, ibeta;
+            PetscScalar alpha, beta;
+            // interpolate
+            Metos3DUtilInterpolate(metos3d, t, ndcs[idc], &ialpha, &alpha, &ibeta, &beta);
+            // set
+            // bgcdc[idc] = dcs[idc][ialpha]
+            // bgcdc[idc] = alpha*bgcdc[idc]
+            // bgcdc[idc] = bgcdc[idc] + beta*dcs[idc][ibeta]
+            VecCopy (dcs[idc][ialpha], bgcdc[idc]);
+            VecScale(bgcdc[idc], alpha);
+            VecAXPY(bgcdc[idc], beta, dcs[idc][ibeta]);
+        }
+        // copy to one vector
+        PetscInt    nvecloc = metos3d->vectorLengthLocal;
+        Metos3DUtilVecCopySeparateToDiagonal(metos3d, ndc, nvecloc, bgcdc, metos3d->bgcdcBD);
+    }
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCStepDomainCondition\n");
+    PetscFunctionReturn(0);
+}
