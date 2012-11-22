@@ -94,13 +94,13 @@ Metos3DSolver(Metos3D *metos3d)
             // solver
             Metos3DSolverSpinup(metos3d);
             
-            // step
-            if (filemax > 0) {
-                PetscFree(metos3d->moduloStep);
-            }
+//            // step
+//            if (filemax > 0) {
+//            }
             
             // file format
             if (filemax > 0) {
+                PetscFree(metos3d->moduloStep);
                 PetscFree(metos3d->filePrefix);
                 for (ifile = 0; ifile < filemax; ifile++) {
                     PetscFree(metos3d->fileFormatPrefix[ifile]);
