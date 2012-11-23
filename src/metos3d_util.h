@@ -26,7 +26,8 @@
 #include "math.h"
 
 // load
-extern PetscErrorCode Metos3DUtilVecLoadIntoVector(Metos3D*, char*, Vec*);
+extern PetscErrorCode Metos3DUtilVectorLoad(Metos3D*, char*, Vec*);
+extern PetscErrorCode Metos3DUtilMatrixLoad(Metos3D*, char*, Mat*);
 extern PetscErrorCode Metos3DUtilMatrixLoadAndCreate(Metos3D*, char*, Mat*);
 // save
 extern PetscErrorCode Metos3DUtilVectorView(Metos3D*, char*, Vec*);

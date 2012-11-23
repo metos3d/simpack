@@ -14,3 +14,9 @@ v0.2rc3
 3. Timing built in now
 
 4. Added WARNING to documentation about Metos3DSpinupMonitorModuloStep
+
+5. Added 'Metos3DUtilMatrixLoad'
+
+6. Metos3DUtilVecLoadIntoVector -> Metos3DUtilVectorLoad
+
+7. Metos3DGeometryInit works with PETSc files now

@@ -50,9 +50,9 @@
 #define kDebugLevel kDebugLevel3
 
 #undef  __FUNCT__
-#define __FUNCT__ "Metos3DUtilVecLoadIntoVector"
+#define __FUNCT__ "Metos3DUtilVectorLoad"
 PetscErrorCode
-Metos3DUtilVecLoadIntoVector(Metos3D *metos3d, char *filePath, Vec *v)
+Metos3DUtilVectorLoad(Metos3D *metos3d, char *filePath, Vec *v)
 {
     MPI_Comm comm = metos3d->comm;
     PetscViewer viewer;
@@ -63,7 +63,7 @@ Metos3DUtilVecLoadIntoVector(Metos3D *metos3d, char *filePath, Vec *v)
     VecLoad(*v, viewer);
     PetscViewerDestroy(&viewer);
     // debug stop
-    Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DUtilVecLoadIntoVector", "filePath:", filePath);
+    Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DUtilVectorLoad", "filePath:", filePath);
     PetscFunctionReturn(0);
 }
 
@@ -106,6 +106,22 @@ Metos3DUtilFormatParse(Metos3D *metos3d, char *string)
     }
     // debug stop
     Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DUtilFormatParse", "format:", string);
+    PetscFunctionReturn(0);
+}
+
+#undef  __FUNCT__
+#define __FUNCT__ "Metos3DUtilMatrixLoad"
+PetscErrorCode
+Metos3DUtilMatrixLoad(Metos3D *metos3d, char *filePath, Mat *A)
+{
+    MPI_Comm comm = metos3d->comm;
+    PetscViewer viewer;
+    PetscFunctionBegin;
+    PetscViewerBinaryOpen(comm, filePath, FILE_MODE_READ, &viewer);
+    MatLoad(*A, viewer);
+    PetscViewerDestroy(&viewer);
+    // debug stop
+    Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DUtilMatrixLoad", "filePath:", filePath);
     PetscFunctionReturn(0);
 }
 

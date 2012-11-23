@@ -99,7 +99,7 @@ Metos3DBGCTracerInit(Metos3D *metos3d)
         {
             sprintf(format, "%s%s", tracerInputDirectory, initFileNameFormat);
             sprintf(filePath, format, itracer);
-            Metos3DUtilVecLoadIntoVector(metos3d, filePath, &metos3d->y0[itracer]);
+            Metos3DUtilVectorLoad(metos3d, filePath, &metos3d->y0[itracer]);
         }
     } else {
         // work vars
@@ -117,7 +117,7 @@ Metos3DBGCTracerInit(Metos3D *metos3d)
             for (itracer = 0; itracer < ntracer; itracer++)
             {
                 sprintf(filePath, "%s%s", tracerInputDirectory, initFileNames[itracer]);                
-                Metos3DUtilVecLoadIntoVector(metos3d, filePath, &metos3d->y0[itracer]);
+                Metos3DUtilVectorLoad(metos3d, filePath, &metos3d->y0[itracer]);
                 PetscFree(initFileNames[itracer]);
             }
         }
@@ -221,7 +221,7 @@ Metos3DBGCBoundaryConditionInit(Metos3D *metos3d)
                 sprintf(fileName, fileFormat, ibcs);
                 sprintf(filePath, "%s%s", inputDirectory, fileName);
                 // load
-                Metos3DUtilVecLoadIntoVector(metos3d, filePath, &metos3d->boundaryConditionArray[ibc][ibcs]);
+                Metos3DUtilVectorLoad(metos3d, filePath, &metos3d->boundaryConditionArray[ibc][ibcs]);
             }
             // name
             PetscFree(conditionName[ibc]);
@@ -291,7 +291,7 @@ Metos3DBGCDomainConditionInit(Metos3D *metos3d)
                 sprintf(fileName, fileFormat, idcs);
                 sprintf(filePath, "%s%s", inputDirectory, fileName);
                 // load
-                Metos3DUtilVecLoadIntoVector(metos3d, filePath, &metos3d->domainConditionArray[idc][idcs]);
+                Metos3DUtilVectorLoad(metos3d, filePath, &metos3d->domainConditionArray[idc][idcs]);
             }            
             // name
             PetscFree(conditionName[idc]);

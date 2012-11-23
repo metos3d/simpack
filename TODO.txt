@@ -3,7 +3,7 @@ TODO list
 1. (*DONE*) Debug: build in timing
 1.1 (*DONE*)Debug: improve output of debug stages
 
-2.          Geometry: use PETSc files only
+2. (*DONE*) Geometry: use PETSc files only
 
 3. (*DONE*) Maintain CHANGELOG file
 
