@@ -7,13 +7,13 @@ TODO list
 
 3. (*DONE*) Maintain CHANGELOG file
 
-4.          Implement load balancing
+4. (*DONE*) Implement load balancing
 
 5.          Implement weights (volumes) in norm
 
 6. (*DONE*) Rewrite simpack for PETSc > 3.1
 
-7.          Fix output routine (Metos3DSpinupMonitorModuloStep)
+7. (*DONE*) Fix output routine (Metos3DSpinupMonitorModuloStep)
 
 8.          Add possibility to provide parameters as binary values in a file
 

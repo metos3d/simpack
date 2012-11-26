@@ -147,20 +147,22 @@ Metos3DTimeStepPhi(Metos3D *metos3d, Vec *yin, Vec *yout, PetscInt nparam, Petsc
         
         // file prefix
         if (npref > 1) {
-            PetscInt modstep = metos3d->moduloStepCount;
-            if (modstep > 0) {
-                PetscInt imodstep = metos3d->moduloStep[1];
-                if (istep%imodstep == 0) {
+            if (metos3d->spinupStep%metos3d->moduloStep[0] == 0) {                
+                PetscInt modstep = metos3d->moduloStepCount;
+                if (modstep > 0) {
+                    PetscInt imodstep = metos3d->moduloStep[1];
+                    if (istep%imodstep == 0) {
+                        sprintf(filePrefixFormat, "%s%s", metos3d->filePrefix, metos3d->fileFormatPrefix[1]);
+                        sprintf(filePrefix, filePrefixFormat, istep);
+                        // output
+                        Metos3DBGCOutputPrefix(metos3d, filePrefix, ntracer, yin);
+                    }
+                } else {
                     sprintf(filePrefixFormat, "%s%s", metos3d->filePrefix, metos3d->fileFormatPrefix[1]);
                     sprintf(filePrefix, filePrefixFormat, istep);
                     // output
                     Metos3DBGCOutputPrefix(metos3d, filePrefix, ntracer, yin);
                 }
-            } else {
-                sprintf(filePrefixFormat, "%s%s", metos3d->filePrefix, metos3d->fileFormatPrefix[1]);
-                sprintf(filePrefix, filePrefixFormat, istep);
-                // output
-                Metos3DBGCOutputPrefix(metos3d, filePrefix, ntracer, yin);
             }
         }
         

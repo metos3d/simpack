@@ -42,6 +42,7 @@ typedef struct {
     char            *filePrefix;
     PetscInt        moduloStepCount;
     PetscInt        *moduloStep;
+    PetscInt        spinupStep;
     // geometry
     PetscInt        profileCount;
     PetscInt        *profileStart;

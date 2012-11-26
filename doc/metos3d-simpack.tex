@@ -611,7 +611,7 @@ sp0000-ts0000-Cs.petsc ... sp0000-ts2879-Cs.petsc
 - a comma separated \textbf{pair} of positive integers, specifying 
 the number of periods and time steps between output \\
 
-\textbf{Example:}
+\textbf{Example 1:}
 \begin{quote}
 Assume we have the same situation as above. The \textbf{additional} option line
 \begin{verbatim}
@@ -621,11 +621,15 @@ will instruct Metos3D to create trajectory data files for every
 period, but only every 240 time steps within a period.
 \end{quote}
 
-\textbf{Warning:} \medskip
-\\
-The modulo step for \textbf{periods} is not fully implemented yet.
-You can specify the modulo step for time steps, but files will be written
-to disk for \textbf{every} model year.
+\textbf{Example 2:}
+\begin{quote}
+Assume we have the same situation as above. The \textbf{additional} option line
+\begin{verbatim}
+-Metos3DSpinupMonitorModuloStep          12,120
+\end{verbatim}
+will instruct Metos3D to create trajectory data files for every 12th
+period and every 120 time steps within a period.
+\end{quote}
 
 % newton
 \subsubsection{Newton}
