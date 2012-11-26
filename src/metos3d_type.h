@@ -43,9 +43,6 @@ typedef struct {
     PetscInt        moduloStepCount;
     PetscInt        *moduloStep;
     // geometry
-    Mat             Profiles;
-    Vec             rVolumes;
-    
     PetscInt        profileCount;
     PetscInt        *profileStart;
     PetscInt        *profileEnd;
