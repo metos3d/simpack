@@ -459,10 +459,14 @@ PetscErrorCode
 Metos3DUtilInterpolate(Metos3D *metos3d, PetscReal t, PetscInt N, PetscInt *i_alpha, PetscScalar *alpha, PetscInt *i_beta, PetscScalar *beta)
 {
     PetscFunctionBegin;
-//    // debug start
-//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // we assume t is (t mod 1.0)!
     if (N > 1) {
+//        PetscScalar w;
+//        w = t * N + 0.5;
+//        *beta    = fmod(w, 1.0);
+//        *i_beta  = (PetscInt)fmod(floor(w), (PetscScalar)N);
+//        *alpha   = (1.0 - *beta);
+//        *i_alpha = (PetscInt)fmod(floor(w) + N - 1, (PetscScalar)N);
         // work vars
         PetscInt    i_work;
         i_work      = (((int)floor(t*2.0*N))+1)/2;
