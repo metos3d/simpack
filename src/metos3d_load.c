@@ -37,7 +37,7 @@ Metos3DLoadInit(Metos3D *metos3d)
     PetscInt    *istart = metos3d->profileStart;
     PetscInt    *iend   = metos3d->profileEnd;
     // work vars
-    PetscInt    nproc, myproc, nvecopt, iproc, iprof;
+    PetscInt    nproc, myproc, iproc, iprof;
     PetscInt    *sumvecloc, *sumvecprev, *sumprofloc, *sumprofprev;
     PetscInt    nvecloc, nvecprev, nprofloc, nprofprev;
     PetscInt    *istartloc, *iendloc;
@@ -55,24 +55,44 @@ Metos3DLoadInit(Metos3D *metos3d)
     PetscMalloc(nproc*sizeof(PetscInt), &sumvecprev);
     PetscMalloc(nproc*sizeof(PetscInt), &sumprofloc);
     PetscMalloc(nproc*sizeof(PetscInt), &sumprofprev);
+
+    //
+    //  new algorithm, load balancing
+    //
     // zero memory
     PetscMemzero(sumvecloc, nproc*sizeof(PetscInt));
-    PetscMemzero(sumvecprev, nproc*sizeof(PetscInt));
     PetscMemzero(sumprofloc, nproc*sizeof(PetscInt));
-    PetscMemzero(sumprofprev, nproc*sizeof(PetscInt));
-    // compute local first
-    nvecopt = nvec/nproc;
-    iproc   = 0;
+    iproc = 0;
     for (iprof = 0; iprof < nprof; iprof++)
     {
+        // compute index
+        iproc = (PetscInt)floor(((istart[iprof]-1.0+0.5*(iend[iprof]-istart[iprof]+1.0))/nvec)*nproc);
         // sum profiles and vector elements per process
         sumvecloc [iproc] = sumvecloc [iproc] + iend[iprof] - istart[iprof] + 1;
         sumprofloc[iproc] = sumprofloc[iproc] + 1;
-        if (sumvecloc[iproc] >= nvecopt) iproc++;
     }
-    // compute previous then
-    sumvecprev [0] = 0;
-    sumprofprev[0] = 0;
+    
+//    //
+//    //  old algorithm, no load balancing
+//    //
+//    // zero memory
+//    PetscMemzero(sumvecloc, nproc*sizeof(PetscInt));
+//    PetscMemzero(sumprofloc, nproc*sizeof(PetscInt));
+//    // compute local first
+//    PetscInt nvecopt;
+//    nvecopt = nvec/nproc;
+//    iproc   = 0;
+//    for (iprof = 0; iprof < nprof; iprof++)
+//    {
+//        // sum profiles and vector elements per process
+//        sumvecloc [iproc] = sumvecloc [iproc] + iend[iprof] - istart[iprof] + 1;
+//        sumprofloc[iproc] = sumprofloc[iproc] + 1;
+//        if (sumvecloc[iproc] >= nvecopt) iproc++;
+//    }
+
+    // compute previous
+    PetscMemzero(sumvecprev, nproc*sizeof(PetscInt));
+    PetscMemzero(sumprofprev, nproc*sizeof(PetscInt));
     for (iproc = 1; iproc < nproc; iproc++)
     {
         sumvecprev [iproc] = sumvecprev [iproc-1] + sumvecloc [iproc-1];
