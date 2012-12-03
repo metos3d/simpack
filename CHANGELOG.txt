@@ -22,3 +22,5 @@ v0.2rc3
 7. Built in load balabncing (metos3d_load.c)
 
 8. Fixed output option (Metos3DSpinupMonitorModuloStep)
+
+9. Moved PetscBarrier from Metos3DTimeStepFunction to Metos3DTimeStepPhi

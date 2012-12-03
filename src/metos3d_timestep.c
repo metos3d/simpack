@@ -76,8 +76,6 @@ Metos3DTimeStepFunction(SNES snes, Vec ynBD, Vec fnBD, void *ctx)
     PetscInt    itracer;
     Vec         *yin, *yinold, *yout;
     PetscFunctionBegin;
-    // wait for all processors  
-    PetscBarrier(PETSC_NULL);
     // create work vectors
     Metos3DUtilVecCreateAndSetValue(metos3d, ntracer, nvec, nvecloc, &yin, 0.0);
     Metos3DUtilVecCreateAndSetValue(metos3d, ntracer, nvec, nvecloc, &yinold, 0.0);
@@ -96,8 +94,7 @@ Metos3DTimeStepFunction(SNES snes, Vec ynBD, Vec fnBD, void *ctx)
     VecDestroyVecs(ntracer, &yin);
     VecDestroyVecs(ntracer, &yinold);
     VecDestroyVecs(ntracer, &yout);
-    // wait for all processors  
-    PetscBarrier(PETSC_NULL);
+    // debug
     Metos3DDebug(metos3d, kDebugLevel, "Metos3DTimeStepFunction\n");
     PetscFunctionReturn(0);
 }
@@ -123,6 +120,8 @@ Metos3DTimeStepPhi(Metos3D *metos3d, Vec *yin, Vec *yout, PetscInt nparam, Petsc
     PetscInt    itracer, istep;
     Vec         *ywork;
     PetscFunctionBegin;
+    // wait for all processors
+    PetscBarrier(PETSC_NULL);
     // prepare work vector
     VecDuplicateVecs(*yin, ntracer, &ywork);
     // init
@@ -147,11 +146,11 @@ Metos3DTimeStepPhi(Metos3D *metos3d, Vec *yin, Vec *yout, PetscInt nparam, Petsc
         
         // file prefix
         if (npref > 1) {
-            if (metos3d->spinupStep%metos3d->moduloStep[0] == 0) {                
+            if ((metos3d->spinupStep+1)%metos3d->moduloStep[0] == 0) {
                 PetscInt modstep = metos3d->moduloStepCount;
                 if (modstep > 0) {
                     PetscInt imodstep = metos3d->moduloStep[1];
-                    if (istep%imodstep == 0) {
+                    if ((istep+1)%imodstep == 0) {
                         sprintf(filePrefixFormat, "%s%s", metos3d->filePrefix, metos3d->fileFormatPrefix[1]);
                         sprintf(filePrefix, filePrefixFormat, istep);
                         // output
@@ -178,6 +177,9 @@ Metos3DTimeStepPhi(Metos3D *metos3d, Vec *yin, Vec *yout, PetscInt nparam, Petsc
     Metos3DBGCStepFinal(metos3d, t, dt, ybgcinBD, ybgcoutBD, nparam, u0);
     // free work vector
     VecDestroyVecs(ntracer, &ywork);
+    // wait for all processors
+    PetscBarrier(PETSC_NULL);
+    // debug
     Metos3DDebug(metos3d, kDebugLevel, "Metos3DTimeStepPhi\n");
     PetscFunctionReturn(0);
 }

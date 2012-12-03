@@ -3,13 +3,14 @@ TODO list
 1. (*DONE*) Debug: build in timing
 1.1 (*DONE*)Debug: improve output of debug stages
 
-2. (*DONE*) Geometry: use PETSc files only
+2. (*POSTPONED*) Geometry: use PETSc files only
 
 3. (*DONE*) Maintain CHANGELOG file
 
 4. (*DONE*) Implement load balancing
 
-5.          Implement weights (volumes) in norm
+5. (*CANCELLED*) Implement weights (volumes) in norm
+                    Just provide them in data.
 
 6. (*DONE*) Rewrite simpack for PETSc > 3.1
 
@@ -25,4 +26,8 @@ TODO list
     src/metos3d_solver.c: In function ‘Metos3DSolver’:
     src/metos3d_solver.c:****: warning: value computed is not used
 
-11. Adapt documentation to changes
+11.         Adapt documentation to changes
+
+12.         Change format from '$' to '%'.
+
+13. (*DONE*) Build in BARRIER into TimeStepPhi

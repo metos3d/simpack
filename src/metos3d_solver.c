@@ -282,25 +282,7 @@ Metos3DSolverSpinup(Metos3D *metos3d)
         // yin = yout
         Metos3DTimeStepPhi(metos3d, yin, yout, nparam, u0);
         for(itracer = 0; itracer < ntracer; itracer++) VecCopy(yout[itracer], yin[itracer]);
-        
-//        // file output
-//        if ((npref > 0) && (npref == 1)) {
-//            // modulo
-//            PetscInt    nmodstep = metos3d->moduloStep[0];
-////            printf("nmodstep: %d", nmodstep);
-////            printf("istep: %d", istep);
-//            if (nmodstep > 0) {
-////                printf("istepnmodstep: %d", istep%nmodstep);
-//                if (istep%nmodstep == 0) {
-//                    // output
-//                    Metos3DBGCOutputPrefix(metos3d, metos3d->filePrefix, ntracer, yin);
-//                }
-//            } else {
-//                // output
-//                Metos3DBGCOutputPrefix(metos3d, metos3d->filePrefix, ntracer, yin);
-//            }
-//        }
-        
+
         // yworkBD = yin
         // ystarBD = ystarBD - yworkBD
         // ynorm
