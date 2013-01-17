@@ -2,39 +2,67 @@ Metos3D: A Marine Ecosystem Toolkit for Optimization and Simulation in 3-D
 
 -- Simulation Package --
 
-The Simulation Package of Metos3D is a software for computation and simulation of steady periodic cycles of passive biogeochemical tracers. It complies to a general programming interface, embedding the biogeochemical modelling into an optimization or optimal control context [Piwonski and Slawig, 2012]. Metos3D is founded on the PETSc library [Balay et al., 2011] as a basis for efficient, parallelized numerical methods. Moreover it's portable and relies only on software, which is freely and public available.
+The Simulation Package of Metos3D is a software for computation and simulation of steady periodic cycles of passive biogeochemical tracers. It complies to a general programming interface, embedding the biogeochemical modelling into an optimization [Piwonski and Slawig, 2012]. Metos3D is founded on the PETSc library [Balay et al., 2011] as a basis for efficient, parallelized numerical methods. Moreover it's portable and relies only on software, which is freely and public available.
 The application of marine transport is based on the Transport Matrix Method, whereas the idea and its use are presented in [Khatiwala et al., 2005], [Khatiwala, 2007] and [Khatiwala, 2008].
 
 -- Quick start --
 
-Assuming PETSc, version 3.1, is installed do the following:
+Assuming PETSc 3.3 is installed, your Metos3D working directory is stored in a variable named $METOS3D, do the following:
 
-1. Prepare the data, i.e. download an archive from https://github.com/metos3d/data, extract it and follow the instructions.
-
-2. Prepare the model, i.e. download an archive from https://github.com/metos3d/model and extract it.
-
-3. Prepare the simulation package, i.e. download an archive from https://github.com/metos3d/simpack, extract it and change into the package directory.
-
-4. Link the data and model directories. For example:
+1. Prepare the data, i.e. clone the data archive, cd into it and follow the instructions in README.txt:
 
 $>
-ln -s ../metos3d-data-v0.2 data
-ln -s ../metos3d-model-v0.2 model
+cd $METOS3D
+git clone https://github.com/metos3d/data.git
+cd data
+cat README.txt
 
-5. Set the PETSc environment variables. For example:
+2. Prepare the models, i.e. clone the model archive:
 
 $>
-. petsc/local.jserver.petsc.opt.txt
+cd $METOS3D
+git clone https://github.com/metos3d/model.git
+
+3. Prepare the simulation package, i.e. clone the simpack archive:
+
+$>
+cd $METOS3D
+git clone https://github.com/metos3d/simpack.git
+
+Assuming now your Metos3D working directory looks like as follows:
+
+$METOS3D/
+	data/
+	model/
+	simpack/
+
+To compile and run the software, do the following:
+
+1. Change into the simulation package directory:
+
+$>
+cd simpack
+
+2. Link the data and model directories. For example:
+
+$>
+ln -s ../data
+ln -s ../model
+
+3. Set the PETSc environment variables. For example:
+
+$>
+. petsc/de.uni-kiel.rz.nesh-fe.petsc-3.3-p5.opt.txt
 
 6. Compile the software with a chosen model. For example:
 
 $>
-make BGC=model/I-Cs/
+make BGC=model/MITgcm-PO4-DOP/
 
 7. Run executable with chosen options. For example:
 
 $>
-./metos3d-simpack-I-Cs.exe model/I-Cs/option/local.jserver.option.I-Cs.simpack.txt
+./metos3d-simpack-MITgcm-PO4-DOP.exe model/MITgcm-PO4-DOP/option/de.uni-kiel.rz.nesh-fe.option.MITgcm-PO4-DOP.simpack.txt
 
 -- Documentation --
 
