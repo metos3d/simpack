@@ -54,12 +54,12 @@ ln -s ../model
 $>
 . petsc/de.uni-kiel.rz.nesh-fe.petsc-3.3-p5.opt.txt
 
-6. Compile the software with a chosen model. For example:
+4. Compile the software with a chosen model. For example:
 
 $>
 make BGC=model/MITgcm-PO4-DOP/
 
-7. Run executable with chosen options. For example:
+5. Run executable with chosen options. For example:
 
 $>
 ./metos3d-simpack-MITgcm-PO4-DOP.exe model/MITgcm-PO4-DOP/option/de.uni-kiel.rz.nesh-fe.option.MITgcm-PO4-DOP.simpack.txt
