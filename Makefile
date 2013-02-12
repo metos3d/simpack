@@ -32,10 +32,9 @@ OBJSC = \
 	src/metos3d.o
 
 # BGC model name
-BGCWORK = $(BGC:%/=%)
-BGCMODELNAME = $(BGCWORK:model/%=%)
+BGCMODELNAME = $(notdir $(BGC:%/=%))
 BGCMODELFILE = model.o
-OBJSBGC = $(addprefix $(BGCWORK)/, $(BGCMODELFILE))
+OBJSBGC = $(addprefix $(BGC)/, $(BGCMODELFILE))
 
 # executable name
 PROGRAMBASE = metos3d-simpack-
