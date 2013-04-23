@@ -22,6 +22,7 @@
 #ifndef METOS3D_TYPE_H
 #define METOS3D_TYPE_H 1
 
+#include "petsclog.h"
 #include "petscsnes.h"
 
 #define max(a, b) (((a) > (b)) ? (a) : (b))
@@ -34,6 +35,9 @@
 typedef struct {
     // communication
     MPI_Comm        comm;
+    // events
+    int             eventTimeStepPhi;
+    int             eventBGCStep;
     // debug
     PetscInt        debugLevel;
     PetscLogDouble  startTime[5];                           // for debug level 0 to 4

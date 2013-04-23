@@ -30,6 +30,8 @@ PetscErrorCode
 Metos3DTimeStepInit(Metos3D *metos3d)
 {
     PetscFunctionBegin;
+    // register event
+    PetscLogEventRegister("TimeStepPhi", 0, &metos3d->eventTimeStepPhi);
 //    // debug start
 //    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // options
@@ -122,6 +124,8 @@ Metos3DTimeStepPhi(Metos3D *metos3d, Vec *yin, Vec *yout, PetscInt nparam, Petsc
     PetscFunctionBegin;
     // wait for all processors
     PetscBarrier(PETSC_NULL);
+    // start log event
+    PetscLogEventBegin(metos3d->eventTimeStepPhi, 0, 0, 0, 0);
     // prepare work vector
     VecDuplicateVecs(*yin, ntracer, &ywork);
     // init
@@ -181,6 +185,8 @@ Metos3DTimeStepPhi(Metos3D *metos3d, Vec *yin, Vec *yout, PetscInt nparam, Petsc
     PetscBarrier(PETSC_NULL);
     // debug
     Metos3DDebug(metos3d, kDebugLevel, "Metos3DTimeStepPhi\n");
+    // stop log event
+    PetscLogEventEnd(metos3d->eventTimeStepPhi, 0, 0, 0, 0);
     PetscFunctionReturn(0);
 }
 

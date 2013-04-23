@@ -30,6 +30,8 @@ PetscErrorCode
 Metos3DBGCInit(Metos3D *metos3d)
 {
     PetscFunctionBegin;
+    // register event
+    PetscLogEventRegister("BGCStep", 0, &metos3d->eventBGCStep);
 //    // debug start
 //    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // init tracer, boundary, domain, parameter
@@ -543,6 +545,8 @@ Metos3DBGCStep(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Vec *y
     PetscScalar *yinarray   = PETSC_NULL;
     PetscScalar *youtarray  = PETSC_NULL;
     PetscFunctionBegin;
+    // start log event
+    PetscLogEventBegin(metos3d->eventBGCStep, 0, 0, 0, 0);
     // boundary condition step
     // domain condition step
     Metos3DBGCStepBoundaryCondition(metos3d, t);
@@ -583,6 +587,8 @@ Metos3DBGCStep(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Vec *y
     VecRestoreArray(*yin, &yinarray);
     VecRestoreArray(*yout, &youtarray);
     Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCStep\n");
+    // stop log event
+    PetscLogEventEnd(metos3d->eventBGCStep, 0, 0, 0, 0);
     PetscFunctionReturn(0);
 }
 
