@@ -22,9 +22,11 @@
 #ifndef METOS3D_TYPE_H
 #define METOS3D_TYPE_H 1
 
+#include "petsctime.h"
 #include "petsclog.h"
 #include "petscsnes.h"
 
+//#define PetscGetTime PetscTime
 #define max(a, b) (((a) > (b)) ? (a) : (b))
 //#define min( a, b ) ( ((a) < (b)) ? (a) : (b) )
 //#define sign( x ) ( ((x) > 0.0) ? 1.0 : ( ((x) < 0.0) ? -1.0 : 0.0 ) )
