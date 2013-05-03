@@ -19,7 +19,7 @@
 #
 
 # object files
-OBJSC = \
+M3DOBJSC = \
 	src/metos3d_debug.o \
 	src/metos3d_util.o \
 	src/metos3d_geometry.o \
@@ -34,7 +34,7 @@ OBJSC = \
 # BGC model name
 BGCMODELNAME = $(notdir $(BGC:%/=%))
 BGCMODELFILE = model.o
-OBJSBGC = $(addprefix $(BGC)/, $(BGCMODELFILE))
+M3DOBJSBGC = $(addprefix $(BGC)/, $(BGCMODELFILE))
 
 # executable name
 PROGRAMBASE = metos3d-simpack-
@@ -43,14 +43,14 @@ PROGRAM = ${PROGRAMBASE}${BGCMODELNAME}.exe
 ALL: $(PROGRAM)
 CFLAGS = -DBGC=metos3dbgc_ -DBGCINIT=metos3dbgcinit_ -DBGCFINAL=metos3dbgcfinal_
 FFLAGS = 
-CLEANFILES = $(OBJSBGC) $(OBJSC) $(PROGRAM)
+CLEANFILES = $(M3DOBJSBGC) $(M3DOBJSC) $(PROGRAM)
 
 ifdef PETSC_DIR
 ifdef BGC
 include $(PETSC_DIR)/conf/variables
 include $(PETSC_DIR)/conf/rules
-$(PROGRAM): $(OBJSBGC) $(OBJSC) chkopts
-	-$(CLINKER) -o $@ $(OBJSBGC) $(OBJSC) $(PETSC_LIB)
+$(PROGRAM): $(M3DOBJSBGC) $(M3DOBJSC) chkopts
+	-$(CLINKER) -o $@ $(M3DOBJSBGC) $(M3DOBJSC) $(PETSC_LIB)
 else
 $(PROGRAM):
 	@echo '###'
