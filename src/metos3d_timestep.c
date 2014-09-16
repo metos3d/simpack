@@ -143,11 +143,6 @@ Metos3DTimeStepPhi(Metos3D *metos3d, Vec *yin, Vec *yout, PetscInt nparam, Petsc
         // work vars
         char filePrefixFormat[PETSC_MAX_PATH_LEN];    
         char filePrefix      [PETSC_MAX_PATH_LEN];    
-        // yout = Phi(yi)
-        // yin = yout
-        Metos3DTimeStepPhiStep(metos3d, t, dt, istep, yin, yout, ywork, nparam, u0);
-        for(itracer = 0; itracer < ntracer; itracer++) VecCopy(yout[itracer], yin[itracer]);
-        
         // file prefix
         if (npref > 1) {
             if ((metos3d->spinupStep+1)%metos3d->moduloStep[0] == 0) {
@@ -168,7 +163,12 @@ Metos3DTimeStepPhi(Metos3D *metos3d, Vec *yin, Vec *yout, PetscInt nparam, Petsc
                 }
             }
         }
-        
+
+        // yout = Phi(yi)
+        // yin = yout
+        Metos3DTimeStepPhiStep(metos3d, t, dt, istep, yin, yout, ywork, nparam, u0);
+        for(itracer = 0; itracer < ntracer; itracer++) VecCopy(yout[itracer], yin[itracer]);
+
         // step forward
         istep++;
         t = fmod(t0 + istep*dt, 1.0);
