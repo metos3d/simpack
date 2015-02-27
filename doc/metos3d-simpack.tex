@@ -15,8 +15,6 @@
 % You should have received a copy of the GNU General Public License
 % along with this program.  If not, see <http://www.gnu.org/licenses/>.
 %
-%   metos3d-simpack.tex
-%
 
 %
 %	document class
@@ -41,8 +39,8 @@
 %
 \title{
 Metos3D\\
-\bigskip
-Simulation Package
+\medskip
+\texttt{simpack}
 }
 \author{
 Jaroslaw Piwonski\thanks{\texttt{jpi@informatik.uni-kiel.de}} \,,
@@ -62,62 +60,43 @@ Excellence Cluster The Future Ocean, Christian-Albrechts-Platz 4, 24118 Kiel, Ge
 The Simulation Package of Metos3D is a software for computation and simulation of
 steady periodic cycles of passive biogeochemical tracers. It complies to a general
 programming interface, embedding the biogeochemical modelling into an
-optimization or optimal control context [Piwonski and Slawig, 2012, in preparation].
+optimization context.
 Metos3D is founded on the PETSc library \cite{PETSc} as a basis for efficient,
 parallelized numerical methods. Moreover it's portable and relies only on software,
 which is freely and public available.
 
-The application of marine transport is based on the so-called Transport Matrix Method,
-whereas the idea and its use are presented in \cite{KhViCa05}, \cite{Kha07} and \cite{Kha08}.
+The application of marine transport is based on the so-called Transport Matrix Method.
+The idea and its use are presented in \cite{KhViCa05}, \cite{Kha07} and \cite{Kha08}.
 
 %
 %	Quick start	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %
 \section{Quick start}
 
-Assuming \href{http://www.mcs.anl.gov/petsc/}{PETSc}, version 3.1,
-is installed do the following:
-
 \begin{enumerate}
 %
-\item Prepare the \textbf{data}, i.e. download an archive from \\
-		\href{https://github.com/metos3d/data}{https://github.com/metos3d/data},
-		extract it and follow the instructions.
+\item
+Install \href{http://www.mcs.anl.gov/petsc/}{PETSc}, 
+\href{http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.3-p7.tar.gz}{version 3.3}.
 %
-\item Prepare the \textbf{model}, i.e. download an archive from \\
-		\href{https://github.com/metos3d/model}{https://github.com/metos3d/model}
-		and extract it.
-%
-\item Prepare the \textbf{simulation package}, i.e. download an archive from \\
-		\href{https://github.com/metos3d/simpack}{https://github.com/metos3d/simpack},
-		extract it and change into the package directory.
-%
-\item Link the data and model directories. For example:
-\begin{verbatim}
-$>
-ln -s ../metos3d-data-v0.2 data
-ln -s ../metos3d-model-v0.2 model
-\end{verbatim}
-%
-\item Set the PETSc environment variables. For example:
-\begin{verbatim}
-$>
-. petsc/local.jserver.petsc.opt.txt
-\end{verbatim}
-%
-\item Compile the software with a chosen model. For example:
-\begin{verbatim}
-$>
-make BGC=model/I-Cs/
-\end{verbatim}
-%
-\item Run executable with chosen options. For example:
-\begin{verbatim}
-$>
-./metos3d-simpack-I-Cs.exe model/I-Cs/option/local.jserver.option.I-Cs.simpack.txt
-\end{verbatim}
-%
+\item
+Visit the Metos3D web page \href{https://metos3d.github.com/metos3d/}{https://metos3d.github.com/metos3d/}
+and follow the instruction to install Metos3D.
 \end{enumerate}
+
+Now, assuming the PETSc variables (\texttt{PETSC\_DIR} and \texttt{PETSC\_ARCH}) are set and
+\texttt{metos3d} is installed as a shell command. 
+%
+To compile the driver routines with the \texttt{MITgcm-PO4-DOP} model and
+run the executable with the provided test option file just type:
+%
+\begin{verbatim}
+$>
+metos3d simpack MITgcm-PO4-DOP
+$>
+./metos3d-simpack-MITgcm-PO4-dop.exe \
+model/MITgcm-PO4-DOP/option/test.MITgcm-PO4-DOP.option.txt
+\end{verbatim}
 
 %
 %	Formats	%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -174,9 +153,8 @@ $\vdots$		& $\vdots$				& $\vdots$			& $\vdots$				& $\vdots$			& $\vdots$			& $
 \section{Options}
 
 Once you have successfully compiled Metos3D you can use an \emph{option file}
-to control the software. You can find examples within the '\texttt{option}'
-directory. \textbf{Comma separated lists must not contain spaces.} The option file
-consists of the following options.
+to control the software. The option file consists of the following options.
+\textbf{Comma separated lists must not contain spaces.} 
 
 %
 %	Debug
@@ -653,7 +631,7 @@ means Line Search with cubic backtracking.
 -Metos3DNewton_snes_ksp_ew
 \end{verbatim}
 The original option name is '\texttt{-snes\_ksp\_ew}'. It specifies,
-if the solver algorithm should use the Eisenstatt-Walker \cite{EisWal1996}
+if the solver algorithm should use the Eisenstatt-Walker \cite{EisWal96}
 tolerance control or not.
 
 \begin{verbatim}
@@ -724,6 +702,63 @@ if the solver should print out the residual norm every Krylov step or not.
 %
 \bibliographystyle{plain}
 %\bibliography{/Users/jpicau/Documents/ARBEIT/CODE/Literature/literature}
-\input{metos3d-simpack-bbl}
-
+\input{metos3d-simpack.bbl.tex}
 \end{document}
+
+
+
+%
+% DUMP
+%
+
+%
+%\item
+%Assuming the PETSc variables (\texttt{PETSC\_DIR} and \texttt{PETSC\_ARCH}) are set and
+%the Metos3D installation directory is added to the shell search path variable (\texttt{PATH}),
+%i.e. \texttt{metos3d} is installed as shell command:
+
+%Assuming \href{http://www.mcs.anl.gov/petsc/}{PETSc},
+%\href{http://ftp.mcs.anl.gov/pub/petsc/release-snapshots/petsc-3.3-p7.tar.gz}{version 3.3},
+%is installed do the following:
+
+%\begin{enumerate}
+%%
+%\item Prepare the \textbf{data}, i.e. download an archive from \\
+%		\href{https://github.com/metos3d/data}{https://github.com/metos3d/data},
+%		extract it and follow the instructions.
+%%
+%\item Prepare the \textbf{model}, i.e. download an archive from \\
+%		\href{https://github.com/metos3d/model}{https://github.com/metos3d/model}
+%		and extract it.
+%%
+%\item Prepare the \textbf{simulation package}, i.e. download an archive from \\
+%		\href{https://github.com/metos3d/simpack}{https://github.com/metos3d/simpack},
+%		extract it and change into the package directory.
+%%
+%\item Link the data and model directories. For example:
+%\begin{verbatim}
+%$>
+%ln -s ../metos3d-data-v0.2 data
+%ln -s ../metos3d-model-v0.2 model
+%\end{verbatim}
+%%
+%\item Set the PETSc environment variables. For example:
+%\begin{verbatim}
+%$>
+%. petsc/local.jserver.petsc.opt.txt
+%\end{verbatim}
+%%
+%\item Compile the software with a chosen model. For example:
+%\begin{verbatim}
+%$>
+%make BGC=model/I-Cs/
+%\end{verbatim}
+%%
+%\item Run executable with chosen options. For example:
+%\begin{verbatim}
+%$>
+%./metos3d-simpack-I-Cs.exe model/I-Cs/option/local.jserver.option.I-Cs.simpack.txt
+%\end{verbatim}
+%%
+%\end{enumerate}
+
