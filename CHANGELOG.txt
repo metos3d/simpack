@@ -1,26 +1,20 @@
-v0.2rc3
+#
+# Metos3D: A Marine Ecosystem Toolkit for Optimization and Simulation in 3-D
+# Copyright (C) 2012  Jaroslaw Piwonski, CAU, jpi@informatik.uni-kiel.de
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
 
-1. Ported from PETSc 3.1 to PETSc 3.3
-1.1 PetscTruth -> PetscBool
-1.2 VecLoadIntoVector -> VecLoad
-1.3 PetscViewerDestroy -> adapted to new signature
-1.4 VecDestroyVecs -> adapted to new signature
-1.5 PetscMatDestroy -> adapted to new signature
-1.6 PetscOptionsGetTruth -> PetscOptionsGetBool
-
-2. changed signature of Metos3DDebug to: Metos3DDebug(Metos3D *metos3d, PetscInt level, const char *format, ...)
-2.1 changed ALL calls to Metos3DDebug
-
-3. Timing built in now
-
-4. Added WARNING to documentation about Metos3DSpinupMonitorModuloStep
-
-5. Added 'Metos3DUtilMatrixLoad'
-
-6. Metos3DUtilVecLoadIntoVector -> Metos3DUtilVectorLoad
-
-7. Built in load balabncing (metos3d_load.c)
-
-8. Fixed output option (Metos3DSpinupMonitorModuloStep)
-
-9. Moved PetscBarrier from Metos3DTimeStepFunction to Metos3DTimeStepPhi
+v0.2
+- official initial version
