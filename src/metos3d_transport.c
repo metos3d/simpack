@@ -77,7 +77,9 @@ PetscErrorCode
 Metos3DTransportMatrixInit(Metos3D *metos3d)
 {
     // work vars
-    char        inputDirectory  [PETSC_MAX_PATH_LEN];    
+    PetscInt    n_vec     = metos3d->vectorLength;
+    PetscInt    n_vec_loc = metos3d->vectorLengthLocal;
+    char        inputDirectory  [PETSC_MAX_PATH_LEN];
     char        formatexp       [PETSC_MAX_PATH_LEN];
     char        formatimp       [PETSC_MAX_PATH_LEN];
     PetscInt    nmat, imat;
