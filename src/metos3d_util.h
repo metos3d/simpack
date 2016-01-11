@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  metos3d_util.h
- *
  */
 
 #ifndef METOS3D_UTIL_H
@@ -28,7 +26,6 @@
 // load
 extern PetscErrorCode Metos3DUtilVectorLoad(Metos3D*, char*, Vec*);
 extern PetscErrorCode Metos3DUtilMatrixLoad(Metos3D*, char*, Mat*);
-extern PetscErrorCode Metos3DUtilMatrixLoadAndCreate(Metos3D*, char*, Mat*);
 // save
 extern PetscErrorCode Metos3DUtilVectorView(Metos3D*, char*, Vec*);
 // format
