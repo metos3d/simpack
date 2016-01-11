@@ -15,8 +15,6 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- *  metos3d_transport.c
- *
  */
 
 #include "metos3d_transport.h"
@@ -109,7 +107,12 @@ Metos3DTransportMatrixInit(Metos3D *metos3d)
         // file path
         sprintf(fileFormat, "%s%s", "%s", formatexp);
         sprintf(filePath, fileFormat, inputDirectory, imat);
-        Metos3DUtilMatrixLoadAndCreate(metos3d, filePath, &Ae[imat]);
+        // create matrix, set size and type
+        MatCreate(metos3d->comm, &Ae[imat]);
+        MatSetSizes(Ae[imat], n_vec_loc, n_vec_loc, n_vec, n_vec);
+        MatSetType(Ae[imat], MATAIJ);
+        // load matrix
+        Metos3DUtilMatrixLoad(metos3d, filePath, &Ae[imat]);
     }
     // work matrix
     MatDuplicate(Ae[0], MAT_DO_NOT_COPY_VALUES, &metos3d->Aework);
@@ -118,7 +121,12 @@ Metos3DTransportMatrixInit(Metos3D *metos3d)
     {
         sprintf(fileFormat, "%s%s", "%s", formatimp);
         sprintf(filePath, fileFormat, inputDirectory, imat);        
-        Metos3DUtilMatrixLoadAndCreate(metos3d, filePath, &Ai[imat]);
+        // create matrix, set size and type
+        MatCreate(metos3d->comm, &Ai[imat]);
+        MatSetSizes(Ai[imat], n_vec_loc, n_vec_loc, n_vec, n_vec);
+        MatSetType(Ai[imat], MATAIJ);
+        // load matrix
+        Metos3DUtilMatrixLoad(metos3d, filePath, &Ai[imat]);
     }
     // work matrix
     MatDuplicate(Ai[0], MAT_DO_NOT_COPY_VALUES, &metos3d->Aiwork);

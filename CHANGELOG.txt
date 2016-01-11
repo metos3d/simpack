@@ -16,5 +16,18 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+v0.3
+Geometry:
+---------
+- we do not read in 'gEndIndices.bin' and 'gStartIndices.bin' any more
+- instead 'landSeaMask.petsc' is read in
+- additionally 'volumes.petsc' is read in, norm computation
+Matrix:
+-------
+- removed MatrixLoadAndCreate, using MatLoad now
+Misc:
+-----
+- removed file names in copyright header
+
 v0.2
 - official initial version
