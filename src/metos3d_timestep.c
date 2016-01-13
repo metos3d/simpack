@@ -30,8 +30,6 @@ Metos3DTimeStepInit(Metos3D *metos3d)
     PetscFunctionBegin;
     // register event
     PetscLogEventRegister("TimeStepPhi", 0, &metos3d->eventTimeStepPhi);
-//    // debug start
-//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // options
     Metos3DUtilOptionsGetScalar(metos3d, "-Metos3DTimeStep", &metos3d->timeStep);
     Metos3DUtilOptionsGetScalar(metos3d, "-Metos3DTimeStepStart", &metos3d->timeStepStart);
@@ -47,8 +45,6 @@ PetscErrorCode
 Metos3DTimeStepFinal(Metos3D *metos3d)
 {
     PetscFunctionBegin;
-//    // debug start
-//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // debug stop
     Metos3DDebug(metos3d, kDebugLevel, "Metos3DTimeStepFinal\n");
     PetscFunctionReturn(0);

@@ -61,8 +61,6 @@ PetscErrorCode
 Metos3DFinal(Metos3D *metos3d)
 {
     PetscFunctionBegin;
-//    // debug start
-//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // wait for all processors
     PetscBarrier(PETSC_NULL);
     // final ..., solver, timestep, transport, bgc, load, geometry

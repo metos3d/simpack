@@ -31,8 +31,6 @@ Metos3DTransportInit(Metos3D *metos3d)
     char        transportType[PETSC_MAX_PATH_LEN];    
     PetscBool   flag;
     PetscFunctionBegin;
-//    // debug start
-//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // transport type
     Metos3DUtilOptionsGetString(metos3d, "-Metos3DTransportType", transportType);
     PetscStrcmp("Matrix", transportType, &flag);
@@ -54,8 +52,6 @@ Metos3DTransportFinal(Metos3D *metos3d)
     char        transportType[PETSC_MAX_PATH_LEN];    
     PetscBool   flag;
     PetscFunctionBegin;
-//    // debug start
-//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // transport type
     Metos3DUtilOptionsGetString(metos3d, "-Metos3DTransportType", transportType);
     PetscStrcmp("Matrix", transportType, &flag);

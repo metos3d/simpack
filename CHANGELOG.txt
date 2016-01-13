@@ -28,6 +28,7 @@ Matrix:
 Misc:
 -----
 - removed file names in copyright header
+- cleaned up code a little
 
 v0.2
 - official initial version

@@ -80,19 +80,11 @@ Metos3DSolver(Metos3D *metos3d)
                 stepmax = 2;
                 PetscMalloc(stepmax*sizeof(PetscInt), &metos3d->moduloStep);
                 PetscOptionsGetIntArray(PETSC_NULL, "-Metos3DSpinupMonitorModuloStep", metos3d->moduloStep, &stepmax, &flag);
-                //                sprintf(message, "Wrong values for -Metos3DSpinupMonitorModuloStep option");
-                //                Metos3DFlag(flag, message);
                 metos3d->moduloStepCount = stepmax;
-                //                printf("stepmax: %d", stepmax);
-                //                printf("moduloStep: %d %d", metos3d->moduloStep[0], metos3d->moduloStep[1]);
             }
             
             // solver
             Metos3DSolverSpinup(metos3d);
-            
-//            // step
-//            if (filemax > 0) {
-//            }
             
             // file format
             if (filemax > 0) {
@@ -132,8 +124,6 @@ Metos3DSolverInit(Metos3D *metos3d)
     char        message   [PETSC_MAX_PATH_LEN];    
     PetscBool   flag;
     PetscFunctionBegin;
-//    // debug start
-//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // solver type
     Metos3DUtilOptionsGetString(metos3d, "-Metos3DSolverType", solverType);
     PetscStrcmp("Newton", solverType, &flag);
@@ -175,8 +165,6 @@ Metos3DSolverFinal(Metos3D *metos3d)
     char        message   [PETSC_MAX_PATH_LEN];    
     PetscBool   flag;
     PetscFunctionBegin;
-//    // debug start
-//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     // solver type
     Metos3DUtilOptionsGetString(metos3d, "-Metos3DSolverType", solverType);
     PetscStrcmp("Newton", solverType, &flag);
@@ -223,8 +211,6 @@ Metos3DSolverSpinup(Metos3D *metos3d)
     Vec         *ystarBD, *yworkBD;
     PetscReal   ynorm;
     PetscFunctionBegin;
-//    // debug start
-//    PetscGetTime(&metos3d->startTime[kDebugLevel]);
     PetscOptionsGetInt(PETSC_NULL, "-Metos3DSpinupCount", &nstep, &flag);
     if (flag == PETSC_TRUE) {
         // count
@@ -252,10 +238,9 @@ Metos3DSolverSpinup(Metos3D *metos3d)
     Metos3DUtilVecCopyDiagonalToSeparate(metos3d, ntracer, nvecloc, ystarBD, yin);
     // monitor
     PetscOptionsGetBool(PETSC_NULL, "-Metos3DSpinupMonitor", &monFlag, &flag);
-    // 
     // spinup
     istep = 0;
-    VecNorm(*ystarBD, NORM_2, &ynorm);
+    ynorm = 1.e300;
     while (1) {
         // check conditions
         if ((countFlag == PETSC_FALSE) && (accFlag == PETSC_TRUE)) {
@@ -289,6 +274,7 @@ Metos3DSolverSpinup(Metos3D *metos3d)
         VecAXPY(*ystarBD, -1.0, *yworkBD);
         VecNorm(*ystarBD, NORM_2, &ynorm);
         VecCopy(*yworkBD, *ystarBD);
+        
         // monitor
         if (monFlag) Metos3DDebug(metos3d, kDebugLevel0, FDSE, istep, "Spinup Function norm", ynorm);
         // step counter
