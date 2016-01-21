@@ -53,7 +53,7 @@ typedef struct {
     PetscInt        *profileEnd;
     PetscInt        profileLengthMax;
     PetscInt        vectorLength;
-    Vec             *volumes;
+    Vec             volumes;
     // load
     PetscInt        processCount;
     PetscInt        processMine;
