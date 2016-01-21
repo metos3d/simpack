@@ -50,7 +50,6 @@ Metos3DGeometryInit(Metos3D *metos3d)
         // options
         Metos3DUtilOptionsGetString(metos3d, "-Metos3DProfileInputDirectory", geometryInputDirectory);
         Metos3DUtilOptionsGetString(metos3d, "-Metos3DProfileMaskFile", maskFile);
-        Metos3DUtilOptionsGetString(metos3d, "-Metos3DProfileVolumeFile", volumeFile);
         
         // profiles from land-sea mask
         sprintf(filePath, "%s%s", geometryInputDirectory, maskFile);
@@ -111,9 +110,35 @@ Metos3DGeometryInit(Metos3D *metos3d)
         Metos3DDebug(metos3d, kDebugLevel, F2SD, "Metos3DGeometryInit", "vectorLength:", vectorLength);
 
         // volumes
+        // read in option
+        Metos3DUtilOptionsGetString(metos3d, "-Metos3DProfileVolumeFile", volumeFile);
+        // create file path
+        sprintf(filePath, "%s%s", geometryInputDirectory, volumeFile);
+        Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DGeometryInit", "filePath:", filePath);
+        // create vector and read in data
+        VecCreateSeq(PETSC_COMM_SELF, vectorLength, &metos3d->volumes);
+        PetscViewerBinaryOpen(PETSC_COMM_SELF, filePath, FILE_MODE_READ, &viewer);
+        VecLoad(metos3d->volumes, viewer);
+        PetscViewerDestroy(&viewer);
+        
+//        MPI_Comm    comm = metos3d->comm;
+//        // work vars
+//        PetscInt    itracer;
+//        PetscFunctionBegin;
+//        // create array
+//        PetscMalloc(ntracer*sizeof(Vec), v);
+//        for (itracer = 0; itracer < ntracer; itracer++)
+//        {
+//            // create vector
+//            VecCreateMPI(comm, nvecloc, nvec, &(*v)[itracer]);
+//            VecSet((*v)[itracer], val);
+//            VecAssemblyBegin((*v)[itracer]);
+//            VecAssemblyEnd  ((*v)[itracer]);
+//        }
+//        // debug
+//        Metos3DDebug(metos3d, kDebugLevel, "Metos3DUtilVecCreateAndSetValue\n");
+//        PetscFunctionReturn(0);
 
-        
-        
 //        Metos3DUtilOptionsGetString(metos3d, "-Metos3DProfileIndexStartFile", profileStartFile);
 //        Metos3DUtilOptionsGetString(metos3d, "-Metos3DProfileIndexEndFile", profileEndFile);
 //        // get start indices (1 indexed)
@@ -157,6 +182,7 @@ Metos3DGeometryInit(Metos3D *metos3d)
 //        // store
 //        metos3d->profileLengthMax = nlayermax;
 //        Metos3DDebug(metos3d, kDebugLevel+1, F2SD, "Metos3DGeometryInit", "profileLengthMax:", nlayermax);
+        
     }
     Metos3DDebug(metos3d, kDebugLevel, "Metos3DGeometryInit\n");
     PetscFunctionReturn(0);
@@ -177,6 +203,7 @@ Metos3DGeometryFinal(Metos3D *metos3d)
     if (flag == PETSC_TRUE) {
         PetscFree(metos3d->profileStart);
         PetscFree(metos3d->profileEnd);
+        VecDestroy(&metos3d->volumes);
     }
     Metos3DDebug(metos3d, kDebugLevel, "Metos3DGeometryFinal\n");
     PetscFunctionReturn(0);    
