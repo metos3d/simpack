@@ -121,7 +121,8 @@ Metos3DSolverInit(Metos3D *metos3d)
     PetscInt    nvecloc     = metos3d->vectorLengthLocal;
     // work vars
     char        solverType[PETSC_MAX_PATH_LEN];    
-    char        message   [PETSC_MAX_PATH_LEN];    
+    char        message   [PETSC_MAX_PATH_LEN];
+    PetscInt    itracer;
     PetscBool   flag;
     PetscFunctionBegin;
     // solver type
@@ -144,7 +145,27 @@ Metos3DSolverInit(Metos3D *metos3d)
     } else {
         PetscStrcmp("Spinup", solverType, &flag);
         if (flag == PETSC_TRUE) {
-            // Spinup            
+            // Spinup
+            // prepare norm weights
+            // create MPI vectors
+            Metos3DUtilVecCreateAndSetValue(metos3d, ntracer, nvec, nvecloc, &metos3d->normWeights, 0.0);
+            Metos3DUtilVecCreateAndSetValue(metos3d, 1, ntracer*nvec, ntracer*nvecloc, &metos3d->normWeightsBD, 0.0);
+            // create scatter context
+            IS is;
+            VecScatter normWeightsScatter;
+            ISCreateStride(PETSC_COMM_SELF, nvec, 0, 1, &is);
+            VecScatterCreate(metos3d->volumes, is, metos3d->normWeights[0], is, &normWeightsScatter);
+            // loop over tracers
+            // copy from volumes to ntracer times normWeights
+            for (itracer = 0; itracer < ntracer; itracer++) {
+                VecScatterBegin(normWeightsScatter, metos3d->volumes, metos3d->normWeights[itracer], INSERT_VALUES, SCATTER_FORWARD);
+                VecScatterEnd(normWeightsScatter, metos3d->volumes, metos3d->normWeights[itracer], INSERT_VALUES, SCATTER_FORWARD);
+            }
+            // destroy scatter context
+            ISDestroy(&is);
+            VecScatterDestroy(&normWeightsScatter);
+            // copy from separate to block diagonal
+            Metos3DUtilVecCopySeparateToDiagonal(metos3d, ntracer, nvecloc, metos3d->normWeights, metos3d->normWeightsBD);
         } else {
             sprintf(message, "Unknown: -Metos3DSolverType %s", solverType);
             Metos3DFlag(flag, message);
@@ -176,7 +197,12 @@ Metos3DSolverFinal(Metos3D *metos3d)
     } else {
         PetscStrcmp("Spinup", solverType, &flag);
         if (flag == PETSC_TRUE) {
+            PetscInt ntracer = metos3d->tracerCount;
             // Spinup
+            // norm weights
+            VecDestroyVecs(1, &metos3d->normWeightsBD);
+            VecDestroyVecs(ntracer, &metos3d->normWeights);
+            
         } else {
             sprintf(message, "Unknown: -Metos3DSolverType %s", solverType);
             Metos3DFlag(flag, message);
@@ -198,24 +224,20 @@ Metos3DSolverSpinup(Metos3D *metos3d)
     PetscInt    nvec    = metos3d->vectorLength;
     PetscInt    nvecloc = metos3d->vectorLengthLocal;
     // parameter
-    PetscInt    nparam      = metos3d->parameterCount;
-    PetscReal   *u0         = metos3d->u0;
+    PetscInt    nparam  = metos3d->parameterCount;
+    PetscReal   *u0     = metos3d->u0;
+    // solver
+    Vec         *normWeightsBD = metos3d->normWeightsBD;
     // work vars
-    char        geometryInputDirectory  [PETSC_MAX_PATH_LEN];
-    char        volumeFile              [PETSC_MAX_PATH_LEN];
-    char        filePath                [PETSC_MAX_PATH_LEN];
     PetscInt    nstep, istep, itracer;
     PetscScalar acc;
     PetscBool   flag        = PETSC_FALSE;
     PetscBool   countFlag   = PETSC_FALSE;
     PetscBool   accFlag     = PETSC_FALSE;
     PetscBool   monFlag     = PETSC_FALSE;
-    PetscBool   weightFlag  = PETSC_FALSE;
     Vec         *yin, *yout;
     Vec         *ystarBD, *yworkBD;
-    Vec         *normWeights;
-    Vec         *normWeightsBD;
-    PetscReal   ynorm;
+    PetscReal   ynorm, ynormweight;
     PetscFunctionBegin;
     PetscOptionsGetInt(PETSC_NULL, "-Metos3DSpinupCount", &nstep, &flag);
     if (flag == PETSC_TRUE) {
@@ -242,24 +264,6 @@ Metos3DSolverSpinup(Metos3D *metos3d)
     // init
     Metos3DUtilVecCopySeparateToDiagonal(metos3d, ntracer, nvecloc, metos3d->y0, ystarBD);
     Metos3DUtilVecCopyDiagonalToSeparate(metos3d, ntracer, nvecloc, ystarBD, yin);
-    // norm weights
-    PetscOptionsGetBool(PETSC_NULL, "-Metos3DSpinupUseScaledNorm", &weightFlag, &flag);
-    if (weightFlag == PETSC_TRUE) {
-        // volume file path
-        Metos3DUtilOptionsGetString(metos3d, "-Metos3DProfileInputDirectory", geometryInputDirectory);
-        Metos3DUtilOptionsGetString(metos3d, "-Metos3DProfileVolumeFile", volumeFile);
-        sprintf(filePath, "%s%s", geometryInputDirectory, volumeFile);
-        Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DGeometryInit", "filePath:", filePath);
-        // vectors
-        Metos3DUtilVecCreateAndSetValue(metos3d, ntracer, nvec, nvecloc, &normWeights, 0.0);
-        Metos3DUtilVecCreateAndSetValue(metos3d, 1, ntracer*nvec, ntracer*nvecloc, &normWeightsBD, 0.0);
-        for (itracer = 0; itracer < ntracer; itracer++) {
-            // load vector
-            Metos3DUtilVectorLoad(metos3d, filePath, &normWeights[itracer]);
-            VecSqrtAbs(normWeights[itracer]);
-        }
-        Metos3DUtilVecCopySeparateToDiagonal(metos3d, ntracer, nvecloc, normWeights, normWeightsBD);
-    }
     // monitor
     PetscOptionsGetBool(PETSC_NULL, "-Metos3DSpinupMonitor", &monFlag, &flag);
     // spinup
@@ -293,20 +297,18 @@ Metos3DSolverSpinup(Metos3D *metos3d)
         // yworkBD = yin
         // ystarBD = ystarBD - yworkBD
         // ynorm
+        // ystarBD = ystarBD .* normWeights
+        // ynormweight
         // ystarBD = yworkBD
         Metos3DUtilVecCopySeparateToDiagonal(metos3d, ntracer, nvecloc, yin, yworkBD);
         VecAXPY(*ystarBD, -1.0, *yworkBD);
-        
-        // if norm weights should be used
-        if (weightFlag == PETSC_TRUE) {
-            VecPointwiseMult(*ystarBD, *normWeightsBD, *ystarBD);
-        }
-        
         VecNorm(*ystarBD, NORM_2, &ynorm);
+        VecPointwiseMult(*ystarBD, *normWeightsBD, *ystarBD);
+        VecNorm(*ystarBD, NORM_2, &ynormweight);
         VecCopy(*yworkBD, *ystarBD);
         
         // monitor
-        if (monFlag) Metos3DDebug(metos3d, kDebugLevel0, FDSE, istep, "Spinup Function norm", ynorm);
+        if (monFlag) Metos3DDebug(metos3d, kDebugLevel0, FDSEE, istep, "Spinup Function norm", ynorm, ynormweight);
         // step counter
         istep++;
     }
@@ -318,10 +320,6 @@ Metos3DSolverSpinup(Metos3D *metos3d)
     VecDestroyVecs(ntracer, &yout);
     VecDestroyVecs(1, &ystarBD);
     VecDestroyVecs(1, &yworkBD);
-    if (weightFlag == PETSC_TRUE) {
-        VecDestroyVecs(ntracer, &normWeights);
-        VecDestroyVecs(1, &normWeightsBD);
-    }
     // debug stop
     Metos3DDebug(metos3d, kDebugLevel, "Metos3DSolverSpinup\n");
 

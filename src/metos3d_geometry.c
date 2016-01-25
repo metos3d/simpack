@@ -120,69 +120,8 @@ Metos3DGeometryInit(Metos3D *metos3d)
         PetscViewerBinaryOpen(PETSC_COMM_SELF, filePath, FILE_MODE_READ, &viewer);
         VecLoad(metos3d->volumes, viewer);
         PetscViewerDestroy(&viewer);
-        
-//        MPI_Comm    comm = metos3d->comm;
-//        // work vars
-//        PetscInt    itracer;
-//        PetscFunctionBegin;
-//        // create array
-//        PetscMalloc(ntracer*sizeof(Vec), v);
-//        for (itracer = 0; itracer < ntracer; itracer++)
-//        {
-//            // create vector
-//            VecCreateMPI(comm, nvecloc, nvec, &(*v)[itracer]);
-//            VecSet((*v)[itracer], val);
-//            VecAssemblyBegin((*v)[itracer]);
-//            VecAssemblyEnd  ((*v)[itracer]);
-//        }
-//        // debug
-//        Metos3DDebug(metos3d, kDebugLevel, "Metos3DUtilVecCreateAndSetValue\n");
-//        PetscFunctionReturn(0);
-
-//        Metos3DUtilOptionsGetString(metos3d, "-Metos3DProfileIndexStartFile", profileStartFile);
-//        Metos3DUtilOptionsGetString(metos3d, "-Metos3DProfileIndexEndFile", profileEndFile);
-//        // get start indices (1 indexed)
-//        // concat file path
-//        sprintf(filePath, "%s%s", geometryInputDirectory, profileStartFile);
-//        Metos3DDebug(metos3d, kDebugLevel+1, F3S, "Metos3DGeometryInit", "filePath:", filePath);
-//        PetscViewerBinaryOpen(comm, filePath, FILE_MODE_READ, &viewer);
-//        // read profile count
-//        PetscViewerBinaryRead(viewer, (void*)&profileCount, 1, PETSC_INT);
-//        // store
-//        metos3d->profileCount = profileCount;
-//        Metos3DDebug(metos3d, kDebugLevel+1, F2SD, "Metos3DGeometryInit", "profileCount:", profileCount);
-//        PetscMalloc(profileCount*sizeof(PetscInt), &metos3d->profileStart);
-//        // read all indices
-//        PetscViewerBinaryRead(viewer, (void*)metos3d->profileStart, profileCount, PETSC_INT);
-//        PetscViewerDestroy(&viewer);
-//        // get end indices (1 indexed)
-//        // concat file path
-//        sprintf(filePath, "%s%s", geometryInputDirectory, profileEndFile);
-//        Metos3DDebug(metos3d, kDebugLevel+1, F3S, "Metos3DGeometryInit", "filePath:", filePath);
-//        PetscViewerBinaryOpen(comm, filePath, FILE_MODE_READ, &viewer);
-//        // read profile count
-//        PetscViewerBinaryRead(viewer, (void*)&profileCount, 1, PETSC_INT);
-//        // store
-//        metos3d->profileCount = profileCount;
-//        Metos3DDebug(metos3d, kDebugLevel+1, F2SD, "Metos3DGeometryInit", "profileCount:", profileCount);
-//        PetscMalloc(profileCount*sizeof(PetscInt), &metos3d->profileEnd);
-//        // read all indices
-//        PetscViewerBinaryRead(viewer, (void*)metos3d->profileEnd, profileCount, PETSC_INT);
-//        PetscViewerDestroy(&viewer);
-//        // determine vector length
-//        vectorLength = metos3d->profileEnd[profileCount-1];
-//        // store
-//        metos3d->vectorLength = vectorLength;
-//        Metos3DDebug(metos3d, kDebugLevel+1, F2SD, "Metos3DGeometryInit", "vectorLength:", vectorLength);
-//        // determine max length of profile
-//        nlayermax = 0;
-//        for (iprof = 0; iprof < profileCount; iprof++) {
-//            nlayermax = max(nlayermax, metos3d->profileEnd[iprof]-metos3d->profileStart[iprof]+1);
-//        }
-//        // store
-//        metos3d->profileLengthMax = nlayermax;
-//        Metos3DDebug(metos3d, kDebugLevel+1, F2SD, "Metos3DGeometryInit", "profileLengthMax:", nlayermax);
-        
+        // compute square root of volumes
+        VecSqrtAbs(metos3d->volumes);
     }
     Metos3DDebug(metos3d, kDebugLevel, "Metos3DGeometryInit\n");
     PetscFunctionReturn(0);
