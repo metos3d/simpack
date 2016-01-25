@@ -91,6 +91,8 @@ typedef struct {
     PetscScalar     timeStepStart;
     PetscInt        timeStepCount;
     // solver
+    Vec             *normWeights;
+    Vec             *normWeightsBD;
     SNES            snes;
     Vec             *fnBD;
     Mat             JShell;
