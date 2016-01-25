@@ -41,6 +41,7 @@
 #define F5S     "%-40s %18s %-42s %14s %-42s\n"                                     // 5 x string
 #define FS5SD   "%-40s %18s %-8d, %14s %-8d, %14s %-8d, %14s %-8d, %14s %-8d\n"     // 1 x string, 5 x (1 x string, 1 x int)
 #define FDSE    "%0004d %s %.12e\n"
+#define FDSEE   "%0004d %s %.12e %.12e\n"
 
 #define SYNCFS5SD "              ... %-40s     %14s %-8d %14s %-8d %14s %-8d %14s %-8d %14s %-8d\n"  // 1 x string, 5 x (1 x string, 1 x int)
 
