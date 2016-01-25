@@ -72,7 +72,7 @@ Metos3DSolver(Metos3D *metos3d)
                 for (ifile = 0; ifile < filemax; ifile++) {
                     Metos3DUtilFormatParse(metos3d, metos3d->fileFormatPrefix[ifile]);
                 }
-                PetscMalloc(PETSC_MAX_PATH_LEN*sizeof(char), &metos3d->filePrefix);
+                PetscMalloc(PETSC_MAX_PATH_LEN * sizeof(char), &metos3d->filePrefix);
             }
             
             // monitor modulo step

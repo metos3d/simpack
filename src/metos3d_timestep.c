@@ -100,19 +100,15 @@ Metos3DTimeStepFunction(SNES snes, Vec ynBD, Vec fnBD, void *ctx)
 PetscErrorCode
 Metos3DTimeStepPhi(Metos3D *metos3d, Vec *yin, Vec *yout, PetscInt nparam, PetscReal *u0)
 {
-    PetscInt    npref   = metos3d->fileFormatPrefixCount;
-    // load
-    PetscInt    nvecloc     = metos3d->vectorLengthLocal;
     // bgc
+    PetscInt    npref       = metos3d->fileFormatPrefixCount;
     PetscInt    ntracer     = metos3d->tracerCount;
-    Vec         *ybgcinBD   = metos3d->ybgcinBD;
-    Vec         *ybgcoutBD  = metos3d->ybgcoutBD;
     // time step
     PetscScalar t0          = metos3d->timeStepStart;
     PetscScalar dt          = metos3d->timeStep;
-    PetscInt    stepmax     = metos3d->timeStepCount;    
+    PetscInt    nstep       = metos3d->timeStepCount;
     // work vars
-    PetscScalar t;
+    PetscScalar tj;
     PetscInt    itracer, istep;
     Vec         *ywork;
     PetscFunctionBegin;
@@ -122,24 +118,20 @@ Metos3DTimeStepPhi(Metos3D *metos3d, Vec *yin, Vec *yout, PetscInt nparam, Petsc
     PetscLogEventBegin(metos3d->eventTimeStepPhi, 0, 0, 0, 0);
     // prepare work vector
     VecDuplicateVecs(*yin, ntracer, &ywork);
-    // init
-    istep = 0;
-    // time step
-    // we project all to a period of 1.0
-    t = fmod(t0, 1.0);
-    // bgc
-    Metos3DUtilVecCopySeparateToDiagonal(metos3d, ntracer, nvecloc, yin, ybgcinBD);
-    VecZeroEntries(*ybgcoutBD);
-    Metos3DBGCStepInit(metos3d, t, dt, ybgcinBD, ybgcoutBD, nparam, u0);
-    // step
-    while(istep < stepmax)
-    {
+    // initial point in time, project time to [0,1[
+    tj = fmod(t0, 1.0);
+    // init bgc, yout not set (yet)
+    Metos3DBGCStepInit(metos3d, tj, dt, yin, yout, nparam, u0);
+    // time step loop
+    for (istep = 0; istep < nstep; istep++) {
+        // point in time
+        tj = fmod(t0 + istep*dt, 1.0);
         // work vars
         char filePrefixFormat[PETSC_MAX_PATH_LEN];    
         char filePrefix      [PETSC_MAX_PATH_LEN];    
         // file prefix
         if (npref > 1) {
-            if ((metos3d->spinupStep+1)%metos3d->moduloStep[0] == 0) {
+            if ((metos3d->spinupStep + 1)%metos3d->moduloStep[0] == 0) {
                 PetscInt modstep = metos3d->moduloStepCount;
                 if (modstep > 0) {
                     PetscInt imodstep = metos3d->moduloStep[1];
@@ -157,30 +149,21 @@ Metos3DTimeStepPhi(Metos3D *metos3d, Vec *yin, Vec *yout, PetscInt nparam, Petsc
                 }
             }
         }
-
         // yout = Phi(yi)
         // yin = yout
-        Metos3DTimeStepPhiStep(metos3d, t, dt, istep, yin, yout, ywork, nparam, u0);
+        Metos3DTimeStepPhiStep(metos3d, tj, dt, istep, yin, yout, ywork, nparam, u0);
         for(itracer = 0; itracer < ntracer; itracer++) VecCopy(yout[itracer], yin[itracer]);
-
-        // step forward
-        istep++;
-        t = fmod(t0 + istep*dt, 1.0);
     }
-    // yin = yout
-    for(itracer = 0; itracer < ntracer; itracer++) VecCopy(yin[itracer], yout[itracer]);
-    // final    
-    Metos3DUtilVecCopySeparateToDiagonal(metos3d, ntracer, nvecloc, yin, ybgcinBD);
-    VecZeroEntries(*ybgcoutBD);
-    Metos3DBGCStepFinal(metos3d, t, dt, ybgcinBD, ybgcoutBD, nparam, u0);
+    // final bgc, yout not set (yet)
+    Metos3DBGCStepFinal(metos3d, tj, dt, yin, yout, nparam, u0);
     // free work vector
     VecDestroyVecs(ntracer, &ywork);
     // wait for all processors
     PetscBarrier(PETSC_NULL);
-    // debug
-    Metos3DDebug(metos3d, kDebugLevel, "Metos3DTimeStepPhi\n");
     // stop log event
     PetscLogEventEnd(metos3d->eventTimeStepPhi, 0, 0, 0, 0);
+    // debug
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DTimeStepPhi\n");
     PetscFunctionReturn(0);
 }
 
@@ -191,10 +174,6 @@ Metos3DTimeStepPhiStep(Metos3D *metos3d, PetscScalar t, PetscScalar dt, PetscInt
 {
     // bgc
     PetscInt    ntracer     = metos3d->tracerCount;
-    Vec         *ybgcinBD   = metos3d->ybgcinBD;
-    Vec         *ybgcoutBD  = metos3d->ybgcoutBD;
-    // load
-    PetscInt    nvecloc     = metos3d->vectorLengthLocal;
     // transport
     PetscInt    nmat        = metos3d->matrixCount;
     Mat         *Ae         = metos3d->matrixExplicitArray;
@@ -205,14 +184,7 @@ Metos3DTimeStepPhiStep(Metos3D *metos3d, PetscScalar t, PetscScalar dt, PetscInt
     PetscInt    itracer;
     PetscFunctionBegin;
     // bgc
-    // ybgcinBD  = yin
-    // ybgcoutBD = 0
-    // ybgcoutBD = bgc(ybgcinBD)
-    // yout      = ybgcoutBD
-    Metos3DUtilVecCopySeparateToDiagonal(metos3d, ntracer, nvecloc, yin, ybgcinBD);
-    VecZeroEntries(*ybgcoutBD);
-    Metos3DBGCStep(metos3d, t, dt, ybgcinBD, ybgcoutBD, nparam, u0);
-    Metos3DUtilVecCopyDiagonalToSeparate(metos3d, ntracer, nvecloc, ybgcoutBD, yout);
+    Metos3DBGCStep(metos3d, t, dt, yin, yout, nparam, u0);
     // transport
     // ywork = Ae*yin
     // ywork = ywork + yout
@@ -220,6 +192,7 @@ Metos3DTimeStepPhiStep(Metos3D *metos3d, PetscScalar t, PetscScalar dt, PetscInt
     Metos3DTransport(metos3d, t, nmat, Ae, ntracer, yin, ywork, Aework);
     for (itracer = 0; itracer < ntracer; itracer++) VecAXPY(ywork[itracer], 1.0, yout[itracer]);
     Metos3DTransport(metos3d, t, nmat, Ai, ntracer, ywork, yout, Aiwork);
+    // debug
     Metos3DDebug(metos3d, kDebugLevel, FSSDSE, "Metos3DTimeStepPhiStep", "istep:", istep, "t:", t);
     PetscFunctionReturn(0);
 }
