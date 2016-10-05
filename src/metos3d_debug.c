@@ -36,7 +36,7 @@ Metos3DDebug(Metos3D *metos3d, PetscInt level, const char *format, ...)
             // get end time
             // compute elapsed time
             // and init new timing
-            PetscGetTime(&endTime);
+            PetscTime(&endTime);
             if (level == 0)
                 elapsedTime = endTime - metos3d->startTime[kDebugLevel0];
             else

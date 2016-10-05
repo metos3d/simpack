@@ -100,7 +100,7 @@ Metos3DUtilOptionsGetInt(Metos3D *metos3d, const char *optionName, PetscInt *iva
     PetscBool   flag = PETSC_FALSE;
     char        message[PETSC_MAX_PATH_LEN];
     PetscFunctionBegin;
-    PetscOptionsGetInt(PETSC_NULL, optionName, ivalue, &flag);
+    PetscOptionsGetInt(PETSC_NULL, PETSC_NULL, optionName, ivalue, &flag);
     sprintf(message, "Please provide the '%s' option", optionName);
     Metos3DFlag(flag, message);
     // debug
@@ -115,7 +115,7 @@ Metos3DUtilOptionsGetScalar(Metos3D *metos3d, const char *optionName, PetscScala
     PetscBool   flag = PETSC_FALSE;
     char        message[PETSC_MAX_PATH_LEN];
     PetscFunctionBegin;
-    PetscOptionsGetScalar(PETSC_NULL, optionName, dvalue, &flag);
+    PetscOptionsGetScalar(PETSC_NULL, PETSC_NULL, optionName, dvalue, &flag);
     sprintf(message, "Please provide the '%s' option", optionName);
     Metos3DFlag(flag, message);    
     // debug
@@ -132,7 +132,7 @@ Metos3DUtilOptionsGetRealArray(Metos3D *metos3d, const char *optionName, PetscIn
     char        message[PETSC_MAX_PATH_LEN];
     PetscInt    i;
     PetscFunctionBegin;
-    PetscOptionsGetRealArray(PETSC_NULL, optionName, dvalue, nmax, &flag);
+    PetscOptionsGetRealArray(PETSC_NULL, PETSC_NULL, optionName, dvalue, nmax, &flag);
     sprintf(message, "Please provide the '%s' option", optionName);
     Metos3DFlag(flag, message);
     for (i=0; i<(*nmax); i++)
@@ -151,7 +151,7 @@ Metos3DUtilOptionsGetString(Metos3D *metos3d, const char *optionName, char *stri
     PetscBool   flag = PETSC_FALSE;
     char        message[PETSC_MAX_PATH_LEN];
     PetscFunctionBegin;
-    PetscOptionsGetString(PETSC_NULL, optionName, string, PETSC_MAX_PATH_LEN, &flag);
+    PetscOptionsGetString(PETSC_NULL, PETSC_NULL, optionName, string, PETSC_MAX_PATH_LEN, &flag);
     sprintf(message, "Please provide the '%s' option", optionName);
     Metos3DFlag(flag, message);    
     // debug

@@ -81,7 +81,7 @@ Metos3DBGCTracerInit(Metos3D *metos3d)
     // 1. file name format
     // 2. file names
     // 3. constant values
-    PetscOptionsGetString(PETSC_NULL, "-Metos3DTracerInitFileFormat", initFileNameFormat, PETSC_MAX_PATH_LEN, &flag);
+    PetscOptionsGetString(PETSC_NULL, PETSC_NULL, "-Metos3DTracerInitFileFormat", initFileNameFormat, PETSC_MAX_PATH_LEN, &flag);
     if (flag == PETSC_TRUE) {
         // work vars
         char    tracerInputDirectory[PETSC_MAX_PATH_LEN];
@@ -104,7 +104,7 @@ Metos3DBGCTracerInit(Metos3D *metos3d)
         char    filePath            [PETSC_MAX_PATH_LEN];
         // file name
         nmax = ntracer;
-        PetscOptionsGetStringArray(PETSC_NULL, "-Metos3DTracerInitFile", initFileNames, &nmax, &flag);
+        PetscOptionsGetStringArray(PETSC_NULL, PETSC_NULL, "-Metos3DTracerInitFile", initFileNames, &nmax, &flag);
         if (flag == PETSC_TRUE)
         {
             // input directory, vector, file name
@@ -194,7 +194,7 @@ Metos3DBGCBoundaryConditionInit(Metos3D *metos3d)
         Metos3DUtilOptionsGetString(metos3d, "-Metos3DBoundaryConditionInputDirectory", inputDirectory);
         // name
         nmax = nbc;
-        PetscOptionsGetStringArray(PETSC_NULL, "-Metos3DBoundaryConditionName", conditionName, &nmax, &flag);
+        PetscOptionsGetStringArray(PETSC_NULL, PETSC_NULL, "-Metos3DBoundaryConditionName", conditionName, &nmax, &flag);
         sprintf(message, "Please provide the '%s' option", "-Metos3DBoundaryConditionName");
         Metos3DFlag(flag, message);
         // 
@@ -264,7 +264,7 @@ Metos3DBGCDomainConditionInit(Metos3D *metos3d)
         Metos3DUtilOptionsGetString(metos3d, "-Metos3DDomainConditionInputDirectory", inputDirectory);
         // name
         nmax = ndc;
-        PetscOptionsGetStringArray(PETSC_NULL, "-Metos3DDomainConditionName", conditionName, &nmax, &flag);
+        PetscOptionsGetStringArray(PETSC_NULL, PETSC_NULL, "-Metos3DDomainConditionName", conditionName, &nmax, &flag);
         sprintf(message, "Please provide the '%s' option", "-Metos3DDomainConditionName");
         Metos3DFlag(flag, message);
         // 
@@ -625,7 +625,7 @@ Metos3DBGCOutput(Metos3D *metos3d, PetscInt n, Vec *v)
     PetscFunctionBegin;
     // output tracer vectors to disk
     Metos3DUtilOptionsGetString(metos3d, "-Metos3DTracerOutputDirectory", outputDirectory);
-    PetscOptionsGetString(PETSC_NULL, "-Metos3DTracerOutputFileFormat", outputFileNameFormat, PETSC_MAX_PATH_LEN, &flag);
+    PetscOptionsGetString(PETSC_NULL, PETSC_NULL, "-Metos3DTracerOutputFileFormat", outputFileNameFormat, PETSC_MAX_PATH_LEN, &flag);
     if (flag == PETSC_TRUE) {
         Metos3DUtilFormatParse(metos3d, outputFileNameFormat);
         for (i_tracer = 0; i_tracer < n; i_tracer++)
@@ -636,7 +636,7 @@ Metos3DBGCOutput(Metos3D *metos3d, PetscInt n, Vec *v)
         }
     } else {
         nmax = n;
-        PetscOptionsGetStringArray(PETSC_NULL, "-Metos3DTracerOutputFile", outputFileNames, &nmax, &flag);
+        PetscOptionsGetStringArray(PETSC_NULL, PETSC_NULL, "-Metos3DTracerOutputFile", outputFileNames, &nmax, &flag);
         if (flag == PETSC_TRUE) {
             for (i_tracer = 0; i_tracer < n; i_tracer++)
             {
@@ -667,7 +667,7 @@ Metos3DBGCOutputPrefix(Metos3D *metos3d, char *prefix, PetscInt n, Vec *v)
     PetscFunctionBegin;
     // output tracer vectors to disk
     Metos3DUtilOptionsGetString(metos3d, "-Metos3DTracerOutputDirectory", outputDirectory);
-    PetscOptionsGetString(PETSC_NULL, "-Metos3DTracerOutputFileFormat", outputFileNameFormat, PETSC_MAX_PATH_LEN, &flag);
+    PetscOptionsGetString(PETSC_NULL, PETSC_NULL, "-Metos3DTracerOutputFileFormat", outputFileNameFormat, PETSC_MAX_PATH_LEN, &flag);
     if (flag == PETSC_TRUE) {
         Metos3DUtilFormatParse(metos3d, outputFileNameFormat);
         for (i_tracer = 0; i_tracer < n; i_tracer++)
@@ -678,7 +678,7 @@ Metos3DBGCOutputPrefix(Metos3D *metos3d, char *prefix, PetscInt n, Vec *v)
         }
     } else {
         nmax = n;
-        PetscOptionsGetStringArray(PETSC_NULL, "-Metos3DTracerOutputFile", outputFileNames, &nmax, &flag);
+        PetscOptionsGetStringArray(PETSC_NULL, PETSC_NULL, "-Metos3DTracerOutputFile", outputFileNames, &nmax, &flag);
         if (flag == PETSC_TRUE) {
             for (i_tracer = 0; i_tracer < n; i_tracer++)
             {
