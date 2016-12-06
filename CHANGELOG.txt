@@ -16,6 +16,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+v0.5.0
+- PETSc 3.7 compatibility
+- skipped v0.4 to adjust version numbers with metos3d repository
+
 v0.3.3
 - updated README and CHANGELOG
 
