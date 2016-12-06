@@ -26,7 +26,7 @@ extern PetscErrorCode Metos3DSolverInit(Metos3D*);
 extern PetscErrorCode Metos3DSolverFinal(Metos3D*);
 // solver
 extern PetscErrorCode Metos3DSolver(Metos3D*);
-extern PetscErrorCode Metos3DSolverFormJacobian(SNES, Vec, Mat*, Mat*, MatStructure*, void*);
+extern PetscErrorCode Metos3DSolverFormJacobian(SNES, Vec, Mat, Mat, void*);
 // spinup
 extern PetscErrorCode Metos3DSolverSpinup(Metos3D*);
 

@@ -66,7 +66,7 @@ Metos3DSolver(Metos3D *metos3d)
             metos3d->fileFormatPrefixCount = 0;
             metos3d->moduloStepCount = 0;
             filemax = 2;
-            PetscOptionsGetStringArray(PETSC_NULL, "-Metos3DSpinupMonitorFileFormatPrefix", metos3d->fileFormatPrefix, &filemax, &flag);
+            PetscOptionsGetStringArray(PETSC_NULL, PETSC_NULL, "-Metos3DSpinupMonitorFileFormatPrefix", metos3d->fileFormatPrefix, &filemax, &flag);
             metos3d->fileFormatPrefixCount = filemax;
             if (filemax > 0) {
                 for (ifile = 0; ifile < filemax; ifile++) {
@@ -79,10 +79,9 @@ Metos3DSolver(Metos3D *metos3d)
             if (filemax > 0) {
                 stepmax = 2;
                 PetscMalloc(stepmax*sizeof(PetscInt), &metos3d->moduloStep);
-                PetscOptionsGetIntArray(PETSC_NULL, "-Metos3DSpinupMonitorModuloStep", metos3d->moduloStep, &stepmax, &flag);
+                PetscOptionsGetIntArray(PETSC_NULL, PETSC_NULL, "-Metos3DSpinupMonitorModuloStep", metos3d->moduloStep, &stepmax, &flag);
                 metos3d->moduloStepCount = stepmax;
             }
-            
             // solver
             Metos3DSolverSpinup(metos3d);
             
@@ -239,13 +238,13 @@ Metos3DSolverSpinup(Metos3D *metos3d)
     Vec         *ystarBD, *yworkBD;
     PetscReal   ynorm, ynormweight;
     PetscFunctionBegin;
-    PetscOptionsGetInt(PETSC_NULL, "-Metos3DSpinupCount", &nstep, &flag);
+    PetscOptionsGetInt(PETSC_NULL, PETSC_NULL, "-Metos3DSpinupCount", &nstep, &flag);
     if (flag == PETSC_TRUE) {
         // count
         countFlag = PETSC_TRUE;
         Metos3DDebug(metos3d, kDebugLevel3, F4SD, "Metos3DSolverSpinup", "optionName:", "-Metos3DSpinupCount", "value:", nstep);
     }
-    PetscOptionsGetScalar(PETSC_NULL, "-Metos3DSpinupTolerance", &acc, &flag);
+    PetscOptionsGetScalar(PETSC_NULL, PETSC_NULL, "-Metos3DSpinupTolerance", &acc, &flag);
     if (flag == PETSC_TRUE) {
         // acc
         accFlag = PETSC_TRUE;
@@ -265,7 +264,7 @@ Metos3DSolverSpinup(Metos3D *metos3d)
     Metos3DUtilVecCopySeparateToDiagonal(metos3d, ntracer, nvecloc, metos3d->y0, ystarBD);
     Metos3DUtilVecCopyDiagonalToSeparate(metos3d, ntracer, nvecloc, ystarBD, yin);
     // monitor
-    PetscOptionsGetBool(PETSC_NULL, "-Metos3DSpinupMonitor", &monFlag, &flag);
+    PetscOptionsGetBool(PETSC_NULL, PETSC_NULL, "-Metos3DSpinupMonitor", &monFlag, &flag);
     // spinup
     istep = 0;
     ynorm = 1.e300;
@@ -285,7 +284,7 @@ Metos3DSolverSpinup(Metos3D *metos3d)
             sprintf(metos3d->filePrefix, metos3d->fileFormatPrefix[0], istep);
         }
         // monitor
-        if (monFlag) PetscGetTime(&metos3d->startTime[kDebugLevel0]);
+        if (monFlag) PetscTime(&metos3d->startTime[kDebugLevel0]);
 
         // set value for output control
         metos3d->spinupStep = istep;
@@ -332,13 +331,13 @@ Metos3DSolverSpinup(Metos3D *metos3d)
 #undef  __FUNCT__
 #define __FUNCT__ "Metos3DSolverFormJacobian"
 PetscErrorCode
-Metos3DSolverFormJacobian(SNES snes, Vec ynBD, Mat *JShell, Mat *PCShell, MatStructure *flag, void *ctx)
+Metos3DSolverFormJacobian(SNES snes, Vec ynBD, Mat JShell, Mat PCShell, void *ctx)
 {
     Metos3D     *metos3d = (Metos3D*)ctx;
     PetscFunctionBegin;
     // assemble matrix after MatSetBase from SNES
-    MatAssemblyBegin(*JShell, MAT_FINAL_ASSEMBLY);
-    MatAssemblyEnd(*JShell, MAT_FINAL_ASSEMBLY);
+    MatAssemblyBegin(JShell, MAT_FINAL_ASSEMBLY);
+    MatAssemblyEnd(JShell, MAT_FINAL_ASSEMBLY);
     Metos3DDebug(metos3d, kDebugLevel, "Metos3DSolverFormJacobian\n");
     PetscFunctionReturn(0);
 }

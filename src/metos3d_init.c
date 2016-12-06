@@ -29,11 +29,11 @@ Metos3DInitWithFilePath(Metos3D *metos3d, const char *filePath)
 {
     PetscFunctionBegin;
     // debug start, kDebugLevel1
-    PetscGetTime(&metos3d->startTime[kDebugLevel1]);
+    PetscTime(&metos3d->startTime[kDebugLevel1]);
     // store communicator
     // read in options file
     metos3d->comm = PETSC_COMM_WORLD;
-    PetscOptionsInsertFile(metos3d->comm, filePath, PETSC_TRUE);
+    PetscOptionsInsertFile(metos3d->comm, PETSC_NULL, filePath, PETSC_TRUE);
     // read in debug option
     metos3d->debugLevel = kDebugLevel0;
     Metos3DUtilOptionsGetInt(metos3d, "-Metos3DDebugLevel", &metos3d->debugLevel);

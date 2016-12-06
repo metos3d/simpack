@@ -126,7 +126,7 @@ Metos3DLoadInit(Metos3D *metos3d)
     // debug
     Metos3DSynchronizedDebug11(debug, kDebugLevel3, comm, SYNCFS5SD, "Metos3DLoadInit", "myproc:", myproc,
         "nvecloc:", nvecloc, "nvecprev:", nvecprev, "nprofloc:", nprofloc, "nprofprev:", nprofprev);
-    PetscSynchronizedFlush(comm);
+    PetscSynchronizedFlush(comm, PETSC_STDOUT);
     // debug stop
     Metos3DDebug(metos3d, kDebugLevel, "Metos3DLoadInit\n");
         
