@@ -23,6 +23,7 @@ int
 main(int argc, char **args)
 {
     PetscInitialize(&argc, &args, PETSC_NULL, PETSC_NULL);
+    PetscPushErrorHandler(PetscAbortErrorHandler, NULL);
     if (argc >= 2) {
         // data type
         Metos3D metos3d;
