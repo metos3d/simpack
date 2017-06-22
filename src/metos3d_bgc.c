@@ -905,7 +905,7 @@ Metos3DBGCTracerMonitor(Metos3D *metos3d, Vec *yin)
         ysumall = ysumall + ysum;
     }
     // print total mass
-    Metos3DDebug(metos3d, kDebugLevel0, "%04d %-10s%-8e\n", metos3d->spinupStep, "Total mass: ", ysumall);
+    Metos3DDebug(metos3d, kDebugLevel0, "%04d %-10s%-24.16e\n", metos3d->spinupStep, "Total mass: ", ysumall);
     // free work vec
     VecDestroyVecs(1, &ywork);
     VecDestroyVecs(1, &yvolumes);
