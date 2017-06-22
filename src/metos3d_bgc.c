@@ -873,7 +873,7 @@ Metos3DBGCTracerMonitor(Metos3D *metos3d, Vec *yin)
     PetscInt    nvecloc = metos3d->vectorLengthLocal;
     // work
     PetscInt    itracer;
-    PetscReal   ysum;
+    PetscReal   ysum, ysumall;
     char        geometryInputDirectory  [PETSC_MAX_PATH_LEN];
     char        volumeFile              [PETSC_MAX_PATH_LEN];
     char        filePath                [PETSC_MAX_PATH_LEN];
@@ -891,6 +891,7 @@ Metos3DBGCTracerMonitor(Metos3D *metos3d, Vec *yin)
     sprintf(filePath, "%s%s", geometryInputDirectory, volumeFile);
     Metos3DUtilVectorLoad(metos3d, filePath, yvolumes);
     // loop over tracers
+    ysumall = 0.0;
     for (itracer = 0; itracer < ntracer; itracer++) {
         // copy to work vec
         VecCopy(yin[itracer], *ywork);
@@ -900,7 +901,11 @@ Metos3DBGCTracerMonitor(Metos3D *metos3d, Vec *yin)
         VecSum(*ywork, &ysum);
         // print out
         Metos3DDebug(metos3d, kDebugLevel0, "%04d %s%02d, %-10s%s%-8e\n", metos3d->spinupStep, "Tracer: ", itracer+1, metos3d->tracerName[itracer], ", total: ", ysum);
+        // sum up
+        ysumall = ysumall + ysum;
     }
+    // print total mass
+    Metos3DDebug(metos3d, kDebugLevel0, "%04d %-10s%-8e\n", metos3d->spinupStep, "Total mass: ", ysumall);
     // free work vec
     VecDestroyVecs(1, &ywork);
     VecDestroyVecs(1, &yvolumes);
