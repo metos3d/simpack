@@ -46,6 +46,8 @@ typedef struct {
     PetscInt        moduloStepCount;
     PetscInt        *moduloStep;
     PetscInt        spinupStep;
+    PetscBool       tracerMonitor;
+    PetscBool       diagMonitor;
     // geometry
     PetscInt        profileCount;
     PetscInt        *profileStart;
@@ -62,14 +64,16 @@ typedef struct {
     PetscInt        profileCountPrevious;
     PetscInt        *profileStartLocal;
     PetscInt        *profileEndLocal;
-    // diag
-    PetscInt        diagCount;
-    Vec             *ydiag;
     // bgc
     PetscInt        tracerCount;
+    char            *tracerName[PETSC_MAX_PATH_LEN];
+    char            *diagName[PETSC_MAX_PATH_LEN];
     Vec             *y0;
     Vec             *ybgcinBD;
     Vec             *ybgcoutBD;
+    PetscInt        diagCount;
+    Vec             *ydiag;
+    Vec             *ydiagBD;
     PetscInt        parameterCount;
     PetscReal       *u0;
     PetscInt        boundaryConditionCount;

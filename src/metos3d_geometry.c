@@ -108,14 +108,13 @@ Metos3DGeometryInit(Metos3D *metos3d)
         // vectorLength
         metos3d->vectorLength = vectorLength;
         Metos3DDebug(metos3d, kDebugLevel, F2SD, "Metos3DGeometryInit", "vectorLength:", vectorLength);
-
         // volumes
         // read in option
         Metos3DUtilOptionsGetString(metos3d, "-Metos3DProfileVolumeFile", volumeFile);
         // create file path
         sprintf(filePath, "%s%s", geometryInputDirectory, volumeFile);
         Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DGeometryInit", "filePath:", filePath);
-        // create vector and read in data
+        // create seq vector and read in data
         VecCreateSeq(PETSC_COMM_SELF, vectorLength, &metos3d->volumes);
         PetscViewerBinaryOpen(PETSC_COMM_SELF, filePath, FILE_MODE_READ, &viewer);
         VecLoad(metos3d->volumes, viewer);

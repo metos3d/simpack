@@ -107,6 +107,27 @@ Metos3DUtilOptionsGetInt(Metos3D *metos3d, const char *optionName, PetscInt *iva
     Metos3DDebug(metos3d, kDebugLevel, F4SD, "Metos3DUtilOptionsGetInt", "optionName:", optionName, "value:", *ivalue);
     PetscFunctionReturn(0);
 }
+
+#undef  __FUNCT__
+#define __FUNCT__ "Metos3DUtilOptionsGetIntArray"
+PetscErrorCode
+Metos3DUtilOptionsGetIntArray(Metos3D *metos3d, const char *optionName, PetscInt *nmax, PetscInt *ivalue)
+{
+    PetscBool   flag = PETSC_FALSE;
+    char        message[PETSC_MAX_PATH_LEN];
+    PetscInt    i;
+    PetscFunctionBegin;
+    PetscOptionsGetIntArray(PETSC_NULL, PETSC_NULL, optionName, ivalue, nmax, &flag);
+    sprintf(message, "Please provide the '%s' option", optionName);
+    Metos3DFlag(flag, message);
+    for (i=0; i<(*nmax); i++)
+    {
+        Metos3DDebug(metos3d, kDebugLevel, F4SD, "Metos3DUtilOptionsGetIntArray", "optionName:", optionName, "value:", ivalue[i]);
+    }
+    // debug
+    PetscFunctionReturn(0);
+}
+
 #undef  __FUNCT__
 #define __FUNCT__ "Metos3DUtilOptionsGetScalar"
 PetscErrorCode

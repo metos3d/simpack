@@ -128,7 +128,7 @@ Metos3DTimeStepPhi(Metos3D *metos3d, Vec *yin, Vec *yout, PetscInt nparam, Petsc
         tj = fmod(t0 + istep*dt, 1.0);
         // work vars
         char filePrefixFormat[PETSC_MAX_PATH_LEN];    
-        char filePrefix      [PETSC_MAX_PATH_LEN];    
+        char filePrefix      [PETSC_MAX_PATH_LEN];
         // file prefix
         if (npref > 1) {
             if ((metos3d->spinupStep + 1)%metos3d->moduloStep[0] == 0) {
@@ -152,8 +152,15 @@ Metos3DTimeStepPhi(Metos3D *metos3d, Vec *yin, Vec *yout, PetscInt nparam, Petsc
         // yout = Phi(yi)
         // yin = yout
         Metos3DTimeStepPhiStep(metos3d, tj, dt, istep, yin, yout, ywork, nparam, u0);
-        for(itracer = 0; itracer < ntracer; itracer++) VecCopy(yout[itracer], yin[itracer]);
+        for(itracer = 0; itracer < ntracer; itracer++) {
+            VecCopy(yout[itracer], yin[itracer]);
+        }
     }
+    
+    // tracer and diag monitor
+    if (metos3d->tracerMonitor) Metos3DBGCTracerMonitor(metos3d, yin);
+    if (metos3d->diagMonitor) Metos3DBGCDiagMonitor(metos3d);
+
     // final bgc, yout not set (yet)
     Metos3DBGCStepFinal(metos3d, tj, dt, yin, yout, nparam, u0);
     // free work vector
@@ -190,7 +197,9 @@ Metos3DTimeStepPhiStep(Metos3D *metos3d, PetscScalar t, PetscScalar dt, PetscInt
     // ywork = ywork + yout
     // yout  = Ai*ywork
     Metos3DTransport(metos3d, t, nmat, Ae, ntracer, yin, ywork, Aework);
-    for (itracer = 0; itracer < ntracer; itracer++) VecAXPY(ywork[itracer], 1.0, yout[itracer]);
+    for (itracer = 0; itracer < ntracer; itracer++) {
+        VecAXPY(ywork[itracer], 1.0, yout[itracer]);
+    }
     Metos3DTransport(metos3d, t, nmat, Ai, ntracer, ywork, yout, Aiwork);
     // debug
     Metos3DDebug(metos3d, kDebugLevel, FSSDSE, "Metos3DTimeStepPhiStep", "istep:", istep, "t:", t);

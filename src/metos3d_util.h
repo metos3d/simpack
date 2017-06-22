@@ -41,6 +41,7 @@ extern PetscErrorCode Metos3DUtilVecCreateAndSetValue(Metos3D*, PetscInt, PetscI
 extern PetscErrorCode Metos3DUtilVecCreateAndSetValues(Metos3D*, PetscInt, PetscInt, PetscInt, Vec**, PetscScalar*);
 // options
 extern PetscErrorCode Metos3DUtilOptionsGetInt(Metos3D*, const char*, PetscInt*);
+extern PetscErrorCode Metos3DUtilOptionsGetIntArray(Metos3D*, const char*, PetscInt*, PetscInt*);
 extern PetscErrorCode Metos3DUtilOptionsGetScalar(Metos3D*, const char*, PetscScalar*);
 extern PetscErrorCode Metos3DUtilOptionsGetRealArray(Metos3D*, const char*, PetscInt*, PetscReal*);
 extern PetscErrorCode Metos3DUtilOptionsGetString(Metos3D*, const char*, char*);

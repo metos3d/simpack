@@ -50,23 +50,23 @@ Metos3DDebug(Metos3D *metos3d, PetscInt level, const char *format, ...)
             }
             if (metos3d->debugLevel == 2)
             {
-                if (level==0) sprintf(newformat, "%12.3fs %s", elapsedTime, format);
-                if (level==1) sprintf(newformat, "%12.3fs . %s", elapsedTime, format);
+                if (level==0) sprintf(newformat, "%12.3fs    %s", elapsedTime, format);
+                if (level==1) sprintf(newformat, "%12.3fs .  %s", elapsedTime, format);
                 if (level==2) sprintf(newformat, "%12.3fs .. %s", elapsedTime, format);
             }
             if (metos3d->debugLevel == 3)
             {
-                if (level==0) sprintf(newformat, "%12.3fs %s", elapsedTime, format);
-                if (level==1) sprintf(newformat, "%12.3fs . %s", elapsedTime, format);
-                if (level==2) sprintf(newformat, "%12.3fs .. %s", elapsedTime, format);
+                if (level==0) sprintf(newformat, "%12.3fs     %s", elapsedTime, format);
+                if (level==1) sprintf(newformat, "%12.3fs .   %s", elapsedTime, format);
+                if (level==2) sprintf(newformat, "%12.3fs ..  %s", elapsedTime, format);
                 if (level==3) sprintf(newformat, "%12.3fs ... %s", elapsedTime, format);
             }
             if (metos3d->debugLevel == 4)
             {
-                if (level==0) sprintf(newformat, "%12.3fs %s", elapsedTime, format);
-                if (level==1) sprintf(newformat, "%12.3fs . %s", elapsedTime, format);
-                if (level==2) sprintf(newformat, "%12.3fs .. %s", elapsedTime, format);
-                if (level==3) sprintf(newformat, "%12.3fs ... %s", elapsedTime, format);
+                if (level==0) sprintf(newformat, "%12.3fs      %s", elapsedTime, format);
+                if (level==1) sprintf(newformat, "%12.3fs .    %s", elapsedTime, format);
+                if (level==2) sprintf(newformat, "%12.3fs ..   %s", elapsedTime, format);
+                if (level==3) sprintf(newformat, "%12.3fs ...  %s", elapsedTime, format);
                 if (level==4) sprintf(newformat, "%12.3fs .... %s", elapsedTime, format);
             }
             // get variable arg list

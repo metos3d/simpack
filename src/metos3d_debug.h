@@ -43,7 +43,7 @@
 #define FDSE    "%0004d %s %.12e\n"
 #define FDSEE   "%0004d %s %.12e %.12e\n"
 
-#define SYNCFS5SD "              ... %-40s     %14s %-8d %14s %-8d %14s %-8d %14s %-8d %14s %-8d\n"  // 1 x string, 5 x (1 x string, 1 x int)
+#define SYNCFS5SD "              ... %-40s     %14s %-8d %12s %-8d %12s %-8d %12s %-8d %12s %-8d\n"  // 1 x string, 5 x (1 x string, 1 x int)
 
 extern PetscErrorCode Metos3DDebug(Metos3D*, PetscInt, const char*, ...);
 extern PetscErrorCode Metos3DFlag(PetscBool, char*);

@@ -291,23 +291,28 @@ Metos3DSolverSpinup(Metos3D *metos3d)
         // phi step
         // yin = yout
         Metos3DTimeStepPhi(metos3d, yin, yout, nparam, u0);
-        for(itracer = 0; itracer < ntracer; itracer++) VecCopy(yout[itracer], yin[itracer]);
-
-        // yworkBD = yin
-        // ystarBD = ystarBD - yworkBD
-        // ynorm
-        // ystarBD = ystarBD .* normWeights
-        // ynormweight
-        // ystarBD = yworkBD
-        Metos3DUtilVecCopySeparateToDiagonal(metos3d, ntracer, nvecloc, yin, yworkBD);
-        VecAXPY(*ystarBD, -1.0, *yworkBD);
-        VecNorm(*ystarBD, NORM_2, &ynorm);
-        VecPointwiseMult(*ystarBD, *normWeightsBD, *ystarBD);
-        VecNorm(*ystarBD, NORM_2, &ynormweight);
-        VecCopy(*yworkBD, *ystarBD);
+        for(itracer = 0; itracer < ntracer; itracer++) {
+            VecCopy(yout[itracer], yin[itracer]);
+        }
         
         // monitor
-        if (monFlag) Metos3DDebug(metos3d, kDebugLevel0, FDSEE, istep, "Spinup Function norm", ynorm, ynormweight);
+        if (monFlag) {
+            // yworkBD = yin
+            // ystarBD = ystarBD - yworkBD
+            // ynorm
+            // ystarBD = ystarBD .* normWeights
+            // ynormweight
+            // ystarBD = yworkBD
+            Metos3DUtilVecCopySeparateToDiagonal(metos3d, ntracer, nvecloc, yin, yworkBD);
+            VecAXPY(*ystarBD, -1.0, *yworkBD);
+            VecNorm(*ystarBD, NORM_2, &ynorm);
+            VecPointwiseMult(*ystarBD, *normWeightsBD, *ystarBD);
+            VecNorm(*ystarBD, NORM_2, &ynormweight);
+            VecCopy(*yworkBD, *ystarBD);
+            // print out
+            Metos3DDebug(metos3d, kDebugLevel0, FDSEE, istep, "Spinup Function norm", ynorm, ynormweight);
+        }
+        
         // step counter
         istep++;
     }
