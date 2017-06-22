@@ -62,6 +62,9 @@ typedef struct {
     PetscInt        profileCountPrevious;
     PetscInt        *profileStartLocal;
     PetscInt        *profileEndLocal;
+    // diag
+    PetscInt        diagCount;
+    Vec             *ydiag;
     // bgc
     PetscInt        tracerCount;
     Vec             *y0;

@@ -32,6 +32,12 @@ Metos3DBGCInit(Metos3D *metos3d)
     PetscLogEventRegister("BGCStep", 0, &metos3d->eventBGCStep);
     // init tracer, boundary, domain, parameter
     Metos3DBGCTracerInit(metos3d);
+    
+    Metos3DBGCDiagnosticInit(metos3d);
+//    Option left: name:-Metos3DTracerDiagnosticCount value: 1
+//    Option left: name:-Metos3DTracerDiagnosticName value: fP
+//    Option left: name:-Metos3DTracerDiagnosticOutputDirectory value: work/
+    
     Metos3DBGCParameterInit(metos3d);
     Metos3DBGCBoundaryConditionInit(metos3d);
     Metos3DBGCDomainConditionInit(metos3d);
@@ -50,6 +56,9 @@ Metos3DBGCFinal(Metos3D *metos3d)
     Metos3DBGCDomainConditionFinal(metos3d);
     Metos3DBGCBoundaryConditionFinal(metos3d);
     Metos3DBGCParameterFinal(metos3d);
+    
+    Metos3DBGCDiagnosticFinal(metos3d);
+
     Metos3DBGCTracerFinal(metos3d);
     // debug stop
     Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCFinal\n");
@@ -58,6 +67,50 @@ Metos3DBGCFinal(Metos3D *metos3d)
 
 #undef  kDebugLevel
 #define kDebugLevel kDebugLevel3
+
+
+
+#undef  __FUNCT__
+#define __FUNCT__ "Metos3DBGCDiagnosticInit"
+PetscErrorCode
+Metos3DBGCDiagnosticInit(Metos3D *metos3d)
+{
+    
+    // work vars
+    PetscInt    ndiag, idiag;
+    PetscInt    nmax;
+    PetscBool   flag;
+    char        *diagFileNames[PETSC_MAX_PATH_LEN];
+    
+    // diag count
+    Metos3DUtilOptionsGetInt(metos3d, "-Metos3DTracerDiagnosticCount", &ndiag);
+    metos3d->diagCount = ndiag;
+    // diag name
+
+    // file name
+    nmax = ndiag;
+    PetscOptionsGetStringArray(PETSC_NULL, PETSC_NULL, "-Metos3DTracerDiagnosticName", diagFileNames, &nmax, &flag);
+    if (flag == PETSC_TRUE) {
+        for(idiag = 0; idiag < ndiag; idiag++) {
+            Metos3DDebug(metos3d, kDebugLevel, F3S, "Metos3DTracerDiagnosticName", "filename:", diagFileNames[idiag]);
+        }
+    }
+    // debug stop
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCDiagnosticInit\n");
+    PetscFunctionReturn(0);
+}
+
+#undef  __FUNCT__
+#define __FUNCT__ "Metos3DBGCDiagnosticFinal"
+PetscErrorCode
+Metos3DBGCDiagnosticFinal(Metos3D *metos3d)
+{
+    // debug stop
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCDiagnosticFinal\n");
+    PetscFunctionReturn(0);
+}
+
+
 
 #undef  __FUNCT__
 #define __FUNCT__ "Metos3DBGCTracerInit"
@@ -585,13 +638,19 @@ Metos3DBGCStep(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Vec *y
             (int*)&nparam,                                      // parameter count
             (int*)&nbc,                                         // boundary condition count
             (int*)&ndc,                                         // domain condition count
+            
+            (int*)&ndc,                                         // diag count
+            
             (double*)&dt,                                       // time step
             (double*)&youtarray[ntracer*(istartloc[iprof]-1)],  // source minus sink
             (double*)&t,                                        // point in time
             (double*)&yinarray [ntracer*(istartloc[iprof]-1)],  // tracer
             (double*)u0,                                        // parameter
             (double*)&bcarray  [nbc*iprof],                     // boundary condition
-            (double*)&dcarray  [ndc*(istartloc[iprof]-1)]       // domain condition
+            (double*)&dcarray  [ndc*(istartloc[iprof]-1)],      // domain condition
+
+            (double*)&dcarray  [ndc*(istartloc[iprof]-1)]       // diag variable
+
             );
 #endif        
     }

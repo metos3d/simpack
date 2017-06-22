@@ -27,11 +27,15 @@
 extern void BGCINIT (int *n, int *nz, int *m, int *nbc, int *ndc, double *dt, double *q, double *t, double *y, double *u, double *bc, double *dc);
 #endif
 #ifdef BGC
-extern void BGC     (int *n, int *nz, int *m, int *nbc, int *ndc, double *dt, double *q, double *t, double *y, double *u, double *bc, double *dc);
+extern void BGC     (int *n, int *nz, int *m, int *nbc, int *ndc, int *ndg, double *dt, double *q, double *t, double *y, double *u, double *bc, double *dc, double *dg);
 #endif
 #ifdef BGCFINAL
 extern void BGCFINAL(int *n, int *nz, int *m, int *nbc, int *ndc, double *dt, double *q, double *t, double *y, double *u, double *bc, double *dc);
 #endif
+
+// diag
+extern PetscErrorCode Metos3DBGCDiagnosticInit(Metos3D*);
+extern PetscErrorCode Metos3DBGCDiagnosticFinal(Metos3D*);
 
 // init
 extern PetscErrorCode Metos3DBGCInit(Metos3D*);
