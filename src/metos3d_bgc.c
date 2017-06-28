@@ -891,7 +891,6 @@ Metos3DBGCTracerMonitor(Metos3D *metos3d, Vec *yin)
     sprintf(filePath, "%s%s", geometryInputDirectory, volumeFile);
     Metos3DUtilVectorLoad(metos3d, filePath, yvolumes);
     // loop over tracers
-    ysumall = 0.0;
     for (itracer = 0; itracer < ntracer; itracer++) {
         // copy to work vec
         VecCopy(yin[itracer], *ywork);
