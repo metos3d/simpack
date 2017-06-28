@@ -120,8 +120,8 @@ Metos3DTimeStepPhi(Metos3D *metos3d, Vec *yin, Vec *yout, PetscInt nparam, Petsc
     VecDuplicateVecs(*yin, ntracer, &ywork);
     // initial point in time, project time to [0,1[
     tj = fmod(t0, 1.0);
-    // init bgc, yout not set (yet)
-    Metos3DBGCStepInit(metos3d, tj, dt, yin, yout, nparam, u0);
+    // begin bgc, yout not set (yet)
+    Metos3DBGCStepBegin(metos3d, tj, dt, yin, yout, nparam, u0);
     // time step loop
     for (istep = 0; istep < nstep; istep++) {
         // point in time
@@ -161,8 +161,8 @@ Metos3DTimeStepPhi(Metos3D *metos3d, Vec *yin, Vec *yout, PetscInt nparam, Petsc
     if (metos3d->tracerMonitor) Metos3DBGCTracerMonitor(metos3d, yin);
     if (metos3d->diagMonitor) Metos3DBGCDiagMonitor(metos3d);
 
-    // final bgc, yout not set (yet)
-    Metos3DBGCStepFinal(metos3d, tj, dt, yin, yout, nparam, u0);
+    // end bgc, yout not set (yet)
+    Metos3DBGCStepEnd(metos3d, tj, dt, yin, yout, nparam, u0);
     // free work vector
     VecDestroyVecs(ntracer, &ywork);
     // wait for all processors

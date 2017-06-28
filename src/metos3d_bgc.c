@@ -489,9 +489,9 @@ Metos3DBGCTracerFinal(Metos3D *metos3d)
 #define kDebugLevel kDebugLevel3
 
 #undef  __FUNCT__
-#define __FUNCT__ "Metos3DBGCStepInit"
+#define __FUNCT__ "Metos3DBGCStepBegin"
 PetscErrorCode
-Metos3DBGCStepInit(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Vec *yout, PetscInt nparam, PetscReal *u0)
+Metos3DBGCStepBegin(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Vec *yout, PetscInt nparam, PetscReal *u0)
 {
     // load
     PetscInt    nvecloc     = metos3d->vectorLengthLocal;
@@ -535,8 +535,8 @@ Metos3DBGCStepInit(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Ve
         //
         // call BGC C API
         //
-#ifdef BGCINIT
-        BGCINIT(
+#ifdef BGCBEGIN
+        BGCBEGIN(
                 (int*)&ntracer,                                     // tracer count
                 (int*)&nlayer,                                      // layer count
                 (int*)&nparam,                                      // parameter count
@@ -561,14 +561,14 @@ Metos3DBGCStepInit(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Ve
     VecRestoreArray(*ybgcoutBD, &youtarray);
     if (ndiag > 0) VecRestoreArray(*ydiagBD, &ydiagarray);
     // debug
-    Metos3DDebug(metos3d, kDebugLevel, F2SE, "Metos3DBGCStepInit", "t:", t);
+    Metos3DDebug(metos3d, kDebugLevel, F2SE, "Metos3DBGCStepBegin", "t:", t);
     PetscFunctionReturn(0);
 }
 
 #undef  __FUNCT__
-#define __FUNCT__ "Metos3DBGCStepFinal"
+#define __FUNCT__ "Metos3DBGCStepEnd"
 PetscErrorCode
-Metos3DBGCStepFinal(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Vec *yout, PetscInt nparam, PetscReal *u0)
+Metos3DBGCStepEnd(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Vec *yout, PetscInt nparam, PetscReal *u0)
 {
     // load
     PetscInt    nvecloc     = metos3d->vectorLengthLocal;
@@ -612,8 +612,8 @@ Metos3DBGCStepFinal(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, V
         //
         // call BGC C API
         //
-#ifdef BGCFINAL
-        BGCFINAL(
+#ifdef BGCEND
+        BGCEND(
                 (int*)&ntracer,                                     // tracer count
                 (int*)&nlayer,                                      // layer count
                 (int*)&nparam,                                      // parameter count
@@ -638,7 +638,7 @@ Metos3DBGCStepFinal(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, V
     VecRestoreArray(*ybgcoutBD, &youtarray);
     if (ndiag > 0) VecRestoreArray(*ydiagBD, &ydiagarray);
     // debug
-    Metos3DDebug(metos3d, kDebugLevel, F2SE, "Metos3DBGCStepFinal", "t:", t);
+    Metos3DDebug(metos3d, kDebugLevel, F2SE, "Metos3DBGCStepEnd", "t:", t);
     PetscFunctionReturn(0);
 }
 

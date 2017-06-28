@@ -22,13 +22,28 @@
 
 #include "metos3d_load.h"
 
-// define BGC, BGCINIT and BGCFINAL in Makefile
+//
+//  BGC API
+//
+
+// define BGCINIT, BGCBEGIN, BGC, BGCEND, BGCFINAL Makefile
+
 #ifdef BGCINIT
 extern void BGCINIT (int*, int*, int*, int*, int*, double*, double*, double*, double*, double*, double*, double*, int*, double*);
 #endif
+
+#ifdef BGCBEGIN
+extern void BGCBEGIN(int*, int*, int*, int*, int*, double*, double*, double*, double*, double*, double*, double*, int*, double*);
+#endif
+
 #ifdef BGC
 extern void BGC     (int*, int*, int*, int*, int*, double*, double*, double*, double*, double*, double*, double*, int*, double*);
 #endif
+
+#ifdef BGCEND
+extern void BGCEND  (int*, int*, int*, int*, int*, double*, double*, double*, double*, double*, double*, double*, int*, double*);
+#endif
+
 #ifdef BGCFINAL
 extern void BGCFINAL(int*, int*, int*, int*, int*, double*, double*, double*, double*, double*, double*, double*, int*, double*);
 #endif
@@ -48,8 +63,8 @@ extern PetscErrorCode Metos3DBGCParameterFinal(Metos3D*);
 extern PetscErrorCode Metos3DBGCDiagFinal(Metos3D*);
 extern PetscErrorCode Metos3DBGCTracerFinal(Metos3D*);
 // step
-extern PetscErrorCode Metos3DBGCStepInit(Metos3D*, PetscReal, PetscReal, Vec*, Vec*, PetscInt, PetscReal*);
-extern PetscErrorCode Metos3DBGCStepFinal(Metos3D*, PetscReal, PetscReal, Vec*, Vec*, PetscInt, PetscReal*);
+extern PetscErrorCode Metos3DBGCStepBegin(Metos3D*, PetscReal, PetscReal, Vec*, Vec*, PetscInt, PetscReal*);
+extern PetscErrorCode Metos3DBGCStepEnd(Metos3D*, PetscReal, PetscReal, Vec*, Vec*, PetscInt, PetscReal*);
 extern PetscErrorCode Metos3DBGCStep(Metos3D*, PetscReal, PetscReal, Vec*, Vec*, PetscInt, PetscReal*);
 extern PetscErrorCode Metos3DBGCStepBoundaryCondition(Metos3D*, PetscReal);
 extern PetscErrorCode Metos3DBGCStepDomainCondition(Metos3D*, PetscReal);
