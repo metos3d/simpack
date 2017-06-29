@@ -265,6 +265,14 @@ Metos3DSolverSpinup(Metos3D *metos3d)
     Metos3DUtilVecCopyDiagonalToSeparate(metos3d, ntracer, nvecloc, ystarBD, yin);
     // monitor
     PetscOptionsGetBool(PETSC_NULL, PETSC_NULL, "-Metos3DSpinupMonitor", &monFlag, &flag);
+    
+    // bgc init
+    PetscScalar t0 = metos3d->timeStepStart;
+    PetscScalar dt = metos3d->timeStep;
+    PetscScalar tj;
+    tj = fmod(t0, 1.0);
+    Metos3DBGCStepInit(metos3d, tj, dt, yin, yout, nparam, u0);
+    
     // spinup
     istep = 0;
     ynorm = 1.e300;
@@ -316,9 +324,12 @@ Metos3DSolverSpinup(Metos3D *metos3d)
         // step counter
         istep++;
     }
+    
+    // bgc final
+    Metos3DBGCStepFinal(metos3d, tj, dt, yin, yout, nparam, u0);
+
     // output
     Metos3DBGCOutput(metos3d, ntracer, yin);
-    
     // free work vectors
     VecDestroyVecs(ntracer, &yin);
     VecDestroyVecs(ntracer, &yout);

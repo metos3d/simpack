@@ -63,6 +63,8 @@ extern PetscErrorCode Metos3DBGCParameterFinal(Metos3D*);
 extern PetscErrorCode Metos3DBGCDiagFinal(Metos3D*);
 extern PetscErrorCode Metos3DBGCTracerFinal(Metos3D*);
 // step
+extern PetscErrorCode Metos3DBGCStepInit(Metos3D*, PetscReal, PetscReal, Vec*, Vec*, PetscInt, PetscReal*);
+extern PetscErrorCode Metos3DBGCStepFinal(Metos3D*, PetscReal, PetscReal, Vec*, Vec*, PetscInt, PetscReal*);
 extern PetscErrorCode Metos3DBGCStepBegin(Metos3D*, PetscReal, PetscReal, Vec*, Vec*, PetscInt, PetscReal*);
 extern PetscErrorCode Metos3DBGCStepEnd(Metos3D*, PetscReal, PetscReal, Vec*, Vec*, PetscInt, PetscReal*);
 extern PetscErrorCode Metos3DBGCStep(Metos3D*, PetscReal, PetscReal, Vec*, Vec*, PetscInt, PetscReal*);
