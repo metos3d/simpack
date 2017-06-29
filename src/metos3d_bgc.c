@@ -570,7 +570,7 @@ Metos3DBGCStepInit(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Ve
 PetscErrorCode
 Metos3DBGCStepFinal(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Vec *yout, PetscInt nparam, PetscReal *u0)
 {
-#ifdef BGCINIT
+#ifdef BGCFINAL
     // load
     PetscInt    nvecloc     = metos3d->vectorLengthLocal;
     PetscInt    nprofloc    = metos3d->profileCountLocal;
