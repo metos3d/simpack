@@ -1097,11 +1097,13 @@ Metos3DBGCDiagMonitor(Metos3D *metos3d)
     Metos3DUtilVecCopyDiagonalToSeparate(metos3d, ndiag, nvecloc, ydiagBD, ydiag);
     // loop over diag tracers
     for (idiag = 0; idiag < ndiag; idiag++) {
-        // copy to work vec
-        VecCopy(ydiag[idiag], *ywork);
-        // ywork = ywork .* volumes
-        // sum(ywork)
-        VecPointwiseMult(*ywork, *yvolumes, *ywork);
+//        // copy to work vec
+//        VecCopy(ydiag[idiag], *ywork);
+//        // ywork = ywork .* volumes
+//        // sum(ywork)
+//        VecPointwiseMult(*ywork, *yvolumes, *ywork);
+//        VecSum(ydiag[idiag], &ysum);
+        // sum up, only
         VecSum(*ywork, &ysum);
         // print out
         Metos3DDebug(metos3d, kDebugLevel0, "%04d %s%02d, %-10s%s%-8e\n", metos3d->spinupStep, "Diagnostics: ", idiag+1, metos3d->diagName[idiag], ", total: ", ysum);
