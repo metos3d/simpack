@@ -1106,7 +1106,7 @@ Metos3DBGCDiagMonitor(Metos3D *metos3d)
         // sum up, only
         VecSum(ydiag[idiag], &ysum);
         // print out
-        Metos3DDebug(metos3d, kDebugLevel0, "%04d %s%02d, %-10s%s%-24.16e\n", metos3d->spinupStep, "Diagnostics: ", idiag+1, metos3d->diagName[idiag], ", total: ", ysum);
+        Metos3DDebug(metos3d, kDebugLevel0, "%04d %s%02d, %-16s%s%-24.16e\n", metos3d->spinupStep, "Diagnostics: ", idiag+1, metos3d->diagName[idiag], ", total: ", ysum);
     }
     // free work vec
     VecDestroyVecs(1, &ywork);
