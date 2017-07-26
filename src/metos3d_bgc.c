@@ -30,7 +30,8 @@ Metos3DBGCInit(Metos3D *metos3d)
     PetscFunctionBegin;
     // register event
     PetscLogEventRegister("BGCStep", 0, &metos3d->eventBGCStep);
-    // init tracer, boundary, domain, parameter
+    // init context, tracer, boundary, domain, parameter
+    Metos3DBGCContextInit(metos3d);
     Metos3DBGCTracerInit(metos3d);
     Metos3DBGCDiagInit(metos3d);
     Metos3DBGCParameterInit(metos3d);
@@ -47,12 +48,13 @@ PetscErrorCode
 Metos3DBGCFinal(Metos3D *metos3d)
 {
     PetscFunctionBegin;
-    // final parameter, domain, boundary, tracer
+    // final parameter, domain, boundary, tracer, context
     Metos3DBGCDomainConditionFinal(metos3d);
     Metos3DBGCBoundaryConditionFinal(metos3d);
     Metos3DBGCParameterFinal(metos3d);
     Metos3DBGCDiagFinal(metos3d);
     Metos3DBGCTracerFinal(metos3d);
+    Metos3DBGCContextFinal(metos3d);
     // debug stop
     Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCFinal\n");
     PetscFunctionReturn(0);
@@ -60,6 +62,38 @@ Metos3DBGCFinal(Metos3D *metos3d)
 
 #undef  kDebugLevel
 #define kDebugLevel kDebugLevel3
+
+#undef  __FUNCT__
+#define __FUNCT__ "Metos3DBGCContextInit"
+PetscErrorCode
+Metos3DBGCContextInit(Metos3D *metos3d)
+{
+    // load
+    PetscInt    nprofloc    = metos3d->profileCountLocal;
+    PetscFunctionBegin;
+
+    // allocate memory for bgc context
+    PetscMalloc(nprofloc * sizeof(void*), &metos3d->context);
+
+    // debug
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCContextInit\n");
+    PetscFunctionReturn(0);
+}
+
+#undef  __FUNCT__
+#define __FUNCT__ "Metos3DBGCContextFinal"
+PetscErrorCode
+Metos3DBGCContextFinal(Metos3D *metos3d)
+{
+    PetscFunctionBegin;
+    
+    // free bgc context
+    PetscFree(metos3d->context);
+
+    // debug
+    Metos3DDebug(metos3d, kDebugLevel, "Metos3DBGCContextFinal\n");
+    PetscFunctionReturn(0);
+}
 
 #undef  __FUNCT__
 #define __FUNCT__ "Metos3DBGCTracerInit"
@@ -500,6 +534,7 @@ Metos3DBGCStepInit(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Ve
     PetscInt    *istartloc  = metos3d->profileStartLocal;
     PetscInt    *iendloc    = metos3d->profileEndLocal;
     // bgc
+    void        **bgcctx    = metos3d->context;
     PetscInt    ntracer     = metos3d->tracerCount;
     PetscInt    nbc         = metos3d->boundaryConditionCount;
     PetscInt    ndc         = metos3d->domainConditionCount;
@@ -537,11 +572,13 @@ Metos3DBGCStepInit(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Ve
         // call BGC C API
         //
         BGCINIT(
+                 (void**)&bgcctx[iprof],                             // bgc context
                  (int*)&ntracer,                                     // tracer count
                  (int*)&nlayer,                                      // layer count
                  (int*)&nparam,                                      // parameter count
                  (int*)&nbc,                                         // boundary condition count
                  (int*)&ndc,                                         // domain condition count
+                 (int*)&ndiag,                                       // diag count
                  (double*)&dt,                                       // time step
                  (double*)&youtarray [ntracer*(istartloc[iprof]-1)], // source minus sink
                  (double*)&t,                                        // point in time
@@ -549,7 +586,6 @@ Metos3DBGCStepInit(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Ve
                  (double*)u0,                                        // parameter
                  (double*)&bcarray   [nbc*iprof],                    // boundary condition
                  (double*)&dcarray   [ndc*(istartloc[iprof]-1)],     // domain condition
-                 (int*)&ndiag,                                       // diag count
                  (double*)&ydiagarray[ndiag*(istartloc[iprof]-1)]    // diag variables
                  );
     }
@@ -577,6 +613,7 @@ Metos3DBGCStepFinal(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, V
     PetscInt    *istartloc  = metos3d->profileStartLocal;
     PetscInt    *iendloc    = metos3d->profileEndLocal;
     // bgc
+    void        **bgcctx    = metos3d->context;
     PetscInt    ntracer     = metos3d->tracerCount;
     PetscInt    nbc         = metos3d->boundaryConditionCount;
     PetscInt    ndc         = metos3d->domainConditionCount;
@@ -614,11 +651,13 @@ Metos3DBGCStepFinal(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, V
         // call BGC C API
         //
         BGCFINAL(
+                (void**)&bgcctx[iprof],                             // bgc context
                 (int*)&ntracer,                                     // tracer count
                 (int*)&nlayer,                                      // layer count
                 (int*)&nparam,                                      // parameter count
                 (int*)&nbc,                                         // boundary condition count
                 (int*)&ndc,                                         // domain condition count
+                (int*)&ndiag,                                       // diag count
                 (double*)&dt,                                       // time step
                 (double*)&youtarray [ntracer*(istartloc[iprof]-1)], // source minus sink
                 (double*)&t,                                        // point in time
@@ -626,7 +665,6 @@ Metos3DBGCStepFinal(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, V
                 (double*)u0,                                        // parameter
                 (double*)&bcarray   [nbc*iprof],                    // boundary condition
                 (double*)&dcarray   [ndc*(istartloc[iprof]-1)],     // domain condition
-                (int*)&ndiag,                                       // diag count
                 (double*)&ydiagarray[ndiag*(istartloc[iprof]-1)]    // diag variables
                 );
     }
@@ -654,6 +692,7 @@ Metos3DBGCStepBegin(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, V
     PetscInt    *istartloc  = metos3d->profileStartLocal;
     PetscInt    *iendloc    = metos3d->profileEndLocal;
     // bgc
+    void        **bgcctx    = metos3d->context;
     PetscInt    ntracer     = metos3d->tracerCount;
     PetscInt    nbc         = metos3d->boundaryConditionCount;
     PetscInt    ndc         = metos3d->domainConditionCount;
@@ -691,11 +730,13 @@ Metos3DBGCStepBegin(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, V
         // call BGC C API
         //
         BGCBEGIN(
+                (void**)&bgcctx[iprof],                             // bgc context
                 (int*)&ntracer,                                     // tracer count
                 (int*)&nlayer,                                      // layer count
                 (int*)&nparam,                                      // parameter count
                 (int*)&nbc,                                         // boundary condition count
                 (int*)&ndc,                                         // domain condition count
+                (int*)&ndiag,                                       // diag count
                 (double*)&dt,                                       // time step
                 (double*)&youtarray [ntracer*(istartloc[iprof]-1)], // source minus sink
                 (double*)&t,                                        // point in time
@@ -703,7 +744,6 @@ Metos3DBGCStepBegin(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, V
                 (double*)u0,                                        // parameter
                 (double*)&bcarray   [nbc*iprof],                    // boundary condition
                 (double*)&dcarray   [ndc*(istartloc[iprof]-1)],     // domain condition
-                (int*)&ndiag,                                       // diag count
                 (double*)&ydiagarray[ndiag*(istartloc[iprof]-1)]    // diag variables
                 );
     }
@@ -731,6 +771,7 @@ Metos3DBGCStepEnd(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Vec
     PetscInt    *istartloc  = metos3d->profileStartLocal;
     PetscInt    *iendloc    = metos3d->profileEndLocal;
     // bgc
+    void        **bgcctx    = metos3d->context;
     PetscInt    ntracer     = metos3d->tracerCount;
     PetscInt    nbc         = metos3d->boundaryConditionCount;
     PetscInt    ndc         = metos3d->domainConditionCount;
@@ -768,11 +809,13 @@ Metos3DBGCStepEnd(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Vec
         // call BGC C API
         //
         BGCEND(
+                (void**)&bgcctx[iprof],                             // bgc context
                 (int*)&ntracer,                                     // tracer count
                 (int*)&nlayer,                                      // layer count
                 (int*)&nparam,                                      // parameter count
                 (int*)&nbc,                                         // boundary condition count
                 (int*)&ndc,                                         // domain condition count
+                (int*)&ndiag,                                       // diag count
                 (double*)&dt,                                       // time step
                 (double*)&youtarray [ntracer*(istartloc[iprof]-1)], // source minus sink
                 (double*)&t,                                        // point in time
@@ -780,7 +823,6 @@ Metos3DBGCStepEnd(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Vec
                 (double*)u0,                                        // parameter
                 (double*)&bcarray   [nbc*iprof],                    // boundary condition
                 (double*)&dcarray   [ndc*(istartloc[iprof]-1)],     // domain condition
-                (int*)&ndiag,                                       // diag count
                 (double*)&ydiagarray[ndiag*(istartloc[iprof]-1)]    // diag variables
                 );
     }
@@ -808,6 +850,7 @@ Metos3DBGCStep(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Vec *y
     PetscInt    *istartloc  = metos3d->profileStartLocal;
     PetscInt    *iendloc    = metos3d->profileEndLocal;
     // bgc
+    void        **bgcctx    = metos3d->context;
     PetscInt    ntracer     = metos3d->tracerCount;
     PetscInt    nbc         = metos3d->boundaryConditionCount;
     PetscInt    ndc         = metos3d->domainConditionCount;
@@ -847,11 +890,13 @@ Metos3DBGCStep(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Vec *y
         // call BGC C API
         //
         BGC(
+            (void**)&bgcctx[iprof],                             // bgc context
             (int*)&ntracer,                                     // tracer count
             (int*)&nlayer,                                      // layer count
             (int*)&nparam,                                      // parameter count
             (int*)&nbc,                                         // boundary condition count
             (int*)&ndc,                                         // domain condition count
+            (int*)&ndiag,                                       // diag count
             (double*)&dt,                                       // time step
             (double*)&youtarray [ntracer*(istartloc[iprof]-1)], // source minus sink
             (double*)&t,                                        // point in time
@@ -859,7 +904,6 @@ Metos3DBGCStep(Metos3D *metos3d, PetscScalar t, PetscScalar dt, Vec *yin, Vec *y
             (double*)u0,                                        // parameter
             (double*)&bcarray   [nbc*iprof],                    // boundary condition
             (double*)&dcarray   [ndc*(istartloc[iprof]-1)],     // domain condition
-            (int*)&ndiag,                                       // diag count
             (double*)&ydiagarray[ndiag*(istartloc[iprof]-1)]    // diag variables
             );
     }

@@ -65,6 +65,7 @@ typedef struct {
     PetscInt        *profileStartLocal;
     PetscInt        *profileEndLocal;
     // bgc
+    void            **context;
     PetscInt        tracerCount;
     char            *tracerName[PETSC_MAX_PATH_LEN];
     char            *diagName[PETSC_MAX_PATH_LEN];

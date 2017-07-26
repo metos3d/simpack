@@ -29,27 +29,28 @@
 // define BGCINIT, BGCBEGIN, BGC, BGCEND, BGCFINAL Makefile
 
 #ifdef BGCINIT
-extern void BGCINIT (int*, int*, int*, int*, int*, double*, double*, double*, double*, double*, double*, double*, int*, double*);
+extern void BGCINIT (void**, int*, int*, int*, int*, int*, int*, double*, double*, double*, double*, double*, double*, double*, double*);
 #endif
 
 #ifdef BGCBEGIN
-extern void BGCBEGIN(int*, int*, int*, int*, int*, double*, double*, double*, double*, double*, double*, double*, int*, double*);
+extern void BGCBEGIN(void**, int*, int*, int*, int*, int*, int*, double*, double*, double*, double*, double*, double*, double*, double*);
 #endif
 
 #ifdef BGC
-extern void BGC     (int*, int*, int*, int*, int*, double*, double*, double*, double*, double*, double*, double*, int*, double*);
+extern void BGC     (void**, int*, int*, int*, int*, int*, int*, double*, double*, double*, double*, double*, double*, double*, double*);
 #endif
 
 #ifdef BGCEND
-extern void BGCEND  (int*, int*, int*, int*, int*, double*, double*, double*, double*, double*, double*, double*, int*, double*);
+extern void BGCEND  (void**, int*, int*, int*, int*, int*, int*, double*, double*, double*, double*, double*, double*, double*, double*);
 #endif
 
 #ifdef BGCFINAL
-extern void BGCFINAL(int*, int*, int*, int*, int*, double*, double*, double*, double*, double*, double*, double*, int*, double*);
+extern void BGCFINAL(void**, int*, int*, int*, int*, int*, int*, double*, double*, double*, double*, double*, double*, double*, double*);
 #endif
 
 // init
 extern PetscErrorCode Metos3DBGCInit(Metos3D*);
+extern PetscErrorCode Metos3DBGCContextInit(Metos3D*);
 extern PetscErrorCode Metos3DBGCTracerInit(Metos3D*);
 extern PetscErrorCode Metos3DBGCDiagInit(Metos3D*);
 extern PetscErrorCode Metos3DBGCParameterInit(Metos3D*);
@@ -62,6 +63,7 @@ extern PetscErrorCode Metos3DBGCBoundaryConditionFinal(Metos3D*);
 extern PetscErrorCode Metos3DBGCParameterFinal(Metos3D*);
 extern PetscErrorCode Metos3DBGCDiagFinal(Metos3D*);
 extern PetscErrorCode Metos3DBGCTracerFinal(Metos3D*);
+extern PetscErrorCode Metos3DBGCContextFinal(Metos3D*);
 // step
 extern PetscErrorCode Metos3DBGCStepInit(Metos3D*, PetscReal, PetscReal, Vec*, Vec*, PetscInt, PetscReal*);
 extern PetscErrorCode Metos3DBGCStepFinal(Metos3D*, PetscReal, PetscReal, Vec*, Vec*, PetscInt, PetscReal*);
