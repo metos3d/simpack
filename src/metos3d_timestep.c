@@ -156,13 +156,11 @@ Metos3DTimeStepPhi(Metos3D *metos3d, Vec *yin, Vec *yout, PetscInt nparam, Petsc
             VecCopy(yout[itracer], yin[itracer]);
         }
     }
-    
+    // end bgc, yout not set (yet)
+    Metos3DBGCStepEnd(metos3d, tj, dt, yin, yout, nparam, u0);
     // tracer and diag monitor
     if (metos3d->tracerMonitor) Metos3DBGCTracerMonitor(metos3d, yin);
     if (metos3d->diagMonitor) Metos3DBGCDiagMonitor(metos3d);
-
-    // end bgc, yout not set (yet)
-    Metos3DBGCStepEnd(metos3d, tj, dt, yin, yout, nparam, u0);
     // free work vector
     VecDestroyVecs(ntracer, &ywork);
     // wait for all processors
